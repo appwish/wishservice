@@ -16,6 +16,7 @@ public class JsonProtoTypeMapper implements ProtoTypeMapper<JsonObject> {
   public Wish mapFrom(final JsonObject json) {
     try {
       final Wish.Builder builder = Wish.newBuilder();
+      json.put("id", json.getString("_id")).remove("_id");
       JsonFormat.parser().merge(json.encode(), builder);
       return builder.build();
     } catch (final InvalidProtocolBufferException e) {
