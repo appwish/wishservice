@@ -1,0 +1,7 @@
+{
+  "env": "dev",
+  "appPort": 8080,
+  "appHost": "localhost",
+  "mongoPort": 27017,
+  "mongoHost": "localhost"
+}

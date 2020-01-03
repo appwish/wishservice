@@ -1,0 +1,86 @@
+plugins {
+  id 'java'
+  id 'application'
+  id "com.google.protobuf" version "0.8.9"
+  id 'com.github.johnrengelman.shadow' version '5.0.0'
+}
+
+group = 'io.appwish'
+version = '1.0.0-SNAPSHOT'
+
+repositories {
+  mavenCentral()
+}
+
+ext {
+  vertxVersion = '3.8.4'
+  junitJupiterEngineVersion = '5.4.0'
+}
+
+application {
+  mainClassName = 'io.vertx.core.Launcher'
+}
+
+sourceCompatibility = '11'
+
+def mainVerticleName = 'io.appwish.wishservice.GRPCVerticle'
+def watchForChange = 'src/**/*'
+def doOnChange = './gradlew classes'
+
+dependencies {
+  implementation "io.vertx:vertx-mongo-client:$vertxVersion"
+  implementation "io.vertx:vertx-grpc:$vertxVersion"
+  implementation "io.vertx:vertx-config:$vertxVersion"
+  implementation "javax.annotation:javax.annotation-api:1.3.2"
+  implementation "com.google.protobuf:protobuf-java-util:3.0.0-beta-1"
+
+  testImplementation "io.vertx:vertx-junit5:$vertxVersion"
+  testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitJupiterEngineVersion"
+  testImplementation "org.junit.jupiter:junit-jupiter-api:$junitJupiterEngineVersion"
+}
+
+sourceSets {
+  main {
+    java {
+      srcDir "${buildDir.absolutePath}/generated/source/proto/main/java"
+      srcDir "${buildDir.absolutePath}/generated/source/proto/main/grpc"
+    }
+  }
+}
+
+shadowJar {
+  classifier = 'fat'
+  manifest {
+    attributes 'Main-Verticle': mainVerticleName
+  }
+  mergeServiceFiles {
+    include 'META-INF/services/io.vertx.core.spi.VerticleFactory'
+  }
+}
+
+test {
+  useJUnitPlatform()
+  testLogging {
+    events 'PASSED', 'FAILED', 'SKIPPED'
+  }
+}
+
+run {
+  args = ['run', mainVerticleName, "--redeploy=$watchForChange", "--launcher-class=$mainClassName", "--on-redeploy=$doOnChange"]
+}
+
+protobuf {
+  protoc {
+    artifact = 'com.google.protobuf:protoc:3.11.0'
+  }
+  plugins {
+    grpc {
+      artifact = "io.vertx:protoc-gen-grpc-java:1.25.0"
+    }
+  }
+  generateProtoTasks {
+    all()*.plugins {
+      grpc
+    }
+  }
+}
