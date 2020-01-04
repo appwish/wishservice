@@ -1,27 +1,30 @@
 package io.appwish.wishservice.repository.impl;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.util.JsonFormat;
 import io.appwish.grpc.Wish;
-import io.appwish.wishservice.GRPCVerticle;
 import io.appwish.wishservice.mapper.impl.JsonProtoTypeMapper;
 import io.appwish.wishservice.repository.WishRepository;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.mongo.MongoClient;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.isNull;
 import static java.util.Objects.nonNull;
 
 public class DocumentWishRepository implements WishRepository {
 
-  private static final Logger LOG = LoggerFactory.getLogger(GRPCVerticle.class);
-  private static final String COLLECTION = "wishes";
+  public static final String COLLECTION = "wishes";
+
+  private static final String DOCUMENT_ID = "_id";
+  private static final String MODEL_ID = "id";
+  private static final String SET = "$set";
+  private static final int FIRST_INDEX = 0;
 
   private final MongoClient client;
   private final JsonProtoTypeMapper mapper;
@@ -29,7 +32,6 @@ public class DocumentWishRepository implements WishRepository {
   public DocumentWishRepository(final MongoClient client, final JsonProtoTypeMapper mapper) {
     this.client = client;
     this.mapper = mapper;
-    initMockData();
   }
 
   public Promise<List<Wish>> findAll() {
@@ -50,12 +52,12 @@ public class DocumentWishRepository implements WishRepository {
 
   public Promise<Optional<Wish>> findOne(final String id) {
     final Promise<Optional<Wish>> promise = Promise.promise();
-    final JsonObject query = new JsonObject().put("_id", id);
+    final JsonObject query = new JsonObject().put(DOCUMENT_ID, id);
 
     client.find(COLLECTION, query, res -> {
       if (res.succeeded()) {
-        if (!res.result().isEmpty() && nonNull(res.result().get(0))) {
-          promise.complete(Optional.of(mapper.mapFrom(res.result().get(0))));
+        if (!res.result().isEmpty() && nonNull(res.result().get(FIRST_INDEX))) {
+          promise.complete(Optional.of(mapper.mapFrom(res.result().get(FIRST_INDEX))));
         } else {
           promise.complete(Optional.empty());
         }
@@ -67,38 +69,84 @@ public class DocumentWishRepository implements WishRepository {
     return promise;
   }
 
-  // TODO to implement
   @Override
-  public Promise<Boolean> add(final Wish appWish) {
-    return null;
+  public Promise<Optional<String>> addOne(final Wish wish) {
+    final Promise<Optional<String>> promise = Promise.promise();
+
+    try {
+      client.insert(COLLECTION, new JsonObject(JsonFormat.printer().print(wish)), event -> {
+        if (event.succeeded()) {
+          if (isNull(event.result())) {
+            promise.complete(Optional.empty());
+          } else {
+            promise.complete(Optional.of(event.result()));
+          }
+        } else {
+          promise.fail(event.cause());
+        }
+      });
+    } catch (final InvalidProtocolBufferException e) {
+      promise.fail(e);
+    }
+
+    return promise;
   }
 
-  // TODO to implement
   @Override
-  public Promise<Boolean> delete(final String id) {
-    return null;
-  }
+  public Promise<Boolean> deleteOne(final String id) {
+    final Promise<Boolean> promise = Promise.promise();
+    final JsonObject query = new JsonObject().put(DOCUMENT_ID, id);
 
-  // TODO remove sample data logic
-  private void initMockData() {
-    MOCK_DATA.forEach(appWish -> client.insert(COLLECTION, appWish, res -> {
-      if (res.succeeded()) {
-        LOG.info("Saved " + appWish);
+    client.removeDocument(COLLECTION, query, event -> {
+      if (event.succeeded()) {
+        if (isNull(event.result())) {
+          promise.complete(false);
+        } else {
+          promise.complete(event.result().getRemovedCount() > 0);
+        }
+      } else {
+        promise.fail(event.cause());
       }
-    }));
+    });
+
+    return promise;
   }
 
-  // TODO remove sample data logic
-  private final List<JsonObject> MOCK_DATA = List.of(
-    new JsonObject(Map.of("_id", "1", "title", "1st title", "description", "1st description", "coverImageUrl", "https://cdn.pixabay.com/photo/2017/07/06/14/44/help-2478193_1280.jpg")),
-    new JsonObject(Map.of("_id", "2", "title", "2nd title", "description", "2nd description", "coverImageUrl", "https://cdn.pixabay.com/photo/2017/07/06/14/44/help-2478193_1280.jpg")),
-    new JsonObject(Map.of("_id", "3", "title", "3rd title", "description", "3rd description", "coverImageUrl", "https://cdn.pixabay.com/photo/2017/07/06/14/44/help-2478193_1280.jpg")),
-    new JsonObject(Map.of("_id", "4", "title", "4th title", "description", "4th description", "coverImageUrl", "https://cdn.pixabay.com/photo/2017/07/06/14/44/help-2478193_1280.jpg")),
-    new JsonObject(Map.of("_id", "5", "title", "5th title", "description", "5th description", "coverImageUrl", "https://cdn.pixabay.com/photo/2017/07/06/14/44/help-2478193_1280.jpg")),
-    new JsonObject(Map.of("_id", "6", "title", "6th title", "description", "6th description", "coverImageUrl", "https://cdn.pixabay.com/photo/2017/07/06/14/44/help-2478193_1280.jpg")),
-    new JsonObject(Map.of("_id", "7", "title", "7th title", "description", "7th description", "coverImageUrl", "https://cdn.pixabay.com/photo/2017/07/06/14/44/help-2478193_1280.jpg")),
-    new JsonObject(Map.of("_id", "8", "title", "8th title", "description", "8th description", "coverImageUrl", "https://cdn.pixabay.com/photo/2017/07/06/14/44/help-2478193_1280.jpg")),
-    new JsonObject(Map.of("_id", "9", "title", "9th title", "description", "9th description", "coverImageUrl", "https://cdn.pixabay.com/photo/2017/07/06/14/44/help-2478193_1280.jpg")),
-    new JsonObject(Map.of("_id", "10", "title", "10th title", "description", "10th description", "coverImageUrl", "https://cdn.pixabay.com/photo/2017/07/06/14/44/help-2478193_1280.jpg"))
-  );
+  @Override
+  public Promise<Boolean> updateOne(final Wish wish) {
+    final Promise<Boolean> promise = Promise.promise();
+    final JsonObject query = new JsonObject().put(DOCUMENT_ID, wish.getId());
+    final JsonObject update = prepareUpdateFor(wish);
+
+    client.updateCollection(COLLECTION, query, update, event -> {
+      if (event.succeeded()) {
+        if (isNull(event.result())) {
+          promise.complete(false);
+        } else {
+          promise.complete(event.result().getDocModified() > 0);
+        }
+      } else {
+        promise.fail(event.cause());
+      }
+    });
+
+    return promise;
+  }
+
+  private JsonObject prepareUpdateFor(final Wish wish) {
+    final JsonObject update = new JsonObject();
+    final JsonObject fields = new JsonObject();
+
+    wish.getAllFields().forEach((fieldDescriptor, o) -> {
+      if (fieldDescriptor.getJsonName().equals(MODEL_ID)) {
+        // do not include
+      } else if (nonNull(o)) {
+        fields.put(fieldDescriptor.getJsonName(), o);
+      }
+    });
+
+    update.put(SET, fields);
+
+    return update;
+  }
 }

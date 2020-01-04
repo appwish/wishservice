@@ -15,6 +15,7 @@ repositories {
 ext {
   vertxVersion = '3.8.4'
   junitJupiterEngineVersion = '5.4.0'
+  testContainersVersion = '1.12.3'
 }
 
 application {
@@ -37,6 +38,9 @@ dependencies {
   testImplementation "io.vertx:vertx-junit5:$vertxVersion"
   testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:$junitJupiterEngineVersion"
   testImplementation "org.junit.jupiter:junit-jupiter-api:$junitJupiterEngineVersion"
+  testImplementation "org.testcontainers:testcontainers:$testContainersVersion"
+  testImplementation "org.testcontainers:junit-jupiter:$testContainersVersion"
+  testImplementation "org.mockito:mockito-core:2.23.4"
 }
 
 sourceSets {

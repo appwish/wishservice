@@ -15,8 +15,10 @@ public class WishService extends WishServiceGrpc.WishServiceVertxImplBase {
   @Override
   public void getWish(final WishQuery request, final Promise<WishReply> response) {
     wishRepository.findOne(request.getId()).future().setHandler(event -> {
-      if (event.succeeded()) {
-        response.complete(WishReply.newBuilder().setWish(event.result().orElse(null)).build());
+      if (event.succeeded() && event.result().isPresent()) {
+        response.complete(WishReply.newBuilder().setWish(event.result().get()).build());
+      } else if (event.succeeded()) {
+        response.complete();
       } else {
         response.fail(event.cause());
       }
