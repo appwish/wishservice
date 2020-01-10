@@ -1,4 +1,5 @@
-# Wishservice - a backend microservice responsible for user wishes in Appwish platform
+# Wishservice
+## Backend microservice responsible for user wishes in Appwish platform
 
 [Appwish architectural design](https://app.creately.com/diagram/ToXBd2y63z4/view)
 
