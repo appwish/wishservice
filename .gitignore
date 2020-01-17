@@ -1,5 +1,7 @@
 ### Vert.x ###
 .vertx/
+build
+out
 
 ### Eclipse ###
 
@@ -58,28 +60,28 @@ local.properties
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 # User-specific stuff:
-.idea/**/workspace.xml
-.idea/**/tasks.xml
-.idea/dictionaries
+build/.idea/**/workspace.xml
+build/.idea/**/tasks.xml
+build/.idea/dictionaries
 
 # Sensitive or high-churn files:
-.idea/**/dataSources/
-.idea/**/dataSources.ids
-.idea/**/dataSources.xml
-.idea/**/dataSources.local.xml
-.idea/**/sqlDataSources.xml
-.idea/**/dynamic.xml
-.idea/**/uiDesigner.xml
+build/.idea/**/dataSources/
+build/.idea/**/dataSources.ids
+build/.idea/**/dataSources.xml
+build/.idea/**/dataSources.local.xml
+build/.idea/**/sqlDataSources.xml
+build/.idea/**/dynamic.xml
+build/.idea/**/uiDesigner.xml
 
 # Gradle:
-.idea/**/gradle.xml
-.idea/**/libraries
+build/.idea/**/gradle.xml
+build/.idea/**/libraries
 
 # CMake
 cmake-buildTool-debug/
 
 # Mongo Explorer plugin:
-.idea/**/mongoSettings.xml
+build/.idea/**/mongoSettings.xml
 
 ## File-based project format:
 *.iws
@@ -88,6 +90,7 @@ cmake-buildTool-debug/
 
 # IntelliJ
 /out/
+.idea
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
@@ -96,7 +99,7 @@ cmake-buildTool-debug/
 atlassian-ide-plugin.xml
 
 # Cursive Clojure plugin
-.idea/replstate.xml
+build/.idea/replstate.xml
 
 # Crashlytics plugin (for Android Studio and IntelliJ)
 com_crashlytics_export_strings.xml
@@ -109,7 +112,7 @@ fabric.properties
 
 *.iml
 modules.xml
-.idea/misc.xml
+build/.idea/misc.xml
 *.ipr
 
 ### macOS ###

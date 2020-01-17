@@ -2,6 +2,9 @@
   "env": "dev",
   "appPort": 8080,
   "appHost": "localhost",
-  "mongoPort": 27017,
-  "mongoHost": "localhost"
+  "dbPort": 5432,
+  "dbHost": "localhost",
+  "dbName": "postgres",
+  "dbUser": "postgres",
+  "dbPassword": "postgres"
 }

@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-docker build -t pjeziorowski/wishservice . && docker push pjeziorowski/wishservice
+docker build -t appwish/wishservice . && docker push appwish/wishservice
