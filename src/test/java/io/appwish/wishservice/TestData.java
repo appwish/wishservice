@@ -24,24 +24,14 @@ public final class TestData {
   public static final int APP_PORT = 8281;
 
   /**
-   * Some random ID you may use in your tests
-   */
+   * Some random values to be used to fill Wish fields in tests
+   * */
   public static final long SOME_ID = 1;
-
-  /**
-   * Some random title you may use in your tests
-   */
+  public static final long SOME_AUTHOR_ID = 9999;
   public static final String SOME_TITLE = "Title1";
-
-  /**
-   * Some random description you may use in your tests
-   */
-  public static final String SOME_DESCRIPTION = "Desc1";
-
-  /**
-   * Some random image url you may use in your tests
-   */
-  public static final String SOME_URL = "Url1";
+  public static final String SOME_CONTENT = "# Gimme the app!";
+  public static final String SOME_COVER_IMAGE_URL = "https://appwish.org/static/hardcoded";
+  public static final String SOME_WISH_URL = "https://appwish.org/wish/hardcoded";
 
   /**
    * Some random error message
@@ -56,10 +46,10 @@ public final class TestData {
   /**
    * Wishes to be reused in tests
    */
-  public static final Wish WISH_1 = new Wish(SOME_ID, SOME_TITLE, SOME_DESCRIPTION, SOME_URL);
-  public static final Wish WISH_2 = new Wish(2, "title2", "desc2", "url2");
-  public static final Wish WISH_3 = new Wish(3, "title3", "desc3", "url3");
-  public static final Wish WISH_4 = new Wish(4, "title4", "desc4", "url4");
+  public static final Wish WISH_1 = new Wish(SOME_ID, SOME_TITLE, SOME_CONTENT, SOME_COVER_IMAGE_URL, SOME_AUTHOR_ID, SOME_WISH_URL);
+  public static final Wish WISH_2 = new Wish(2, "title2", "desc2", "url2", 92, "posturl2");
+  public static final Wish WISH_3 = new Wish(3, "title3", "desc3", "url3", 93, "posturl3");
+  public static final Wish WISH_4 = new Wish(4, "title4", "desc4", "url4", 94, "posturl4");
 
   /**
    * List of random wishes to be used in tests
@@ -76,20 +66,24 @@ public final class TestData {
    */
   public static final WishInput WISH_INPUT_1 = new WishInput(
     TestData.WISH_1.getTitle(),
-    TestData.WISH_1.getDescription(),
-    TestData.WISH_1.getCoverImageUrl());
+    TestData.WISH_1.getContent(),
+    TestData.WISH_1.getCoverImageUrl(),
+    TestData.WISH_1.getAuthorId());
   public static final WishInput WISH_INPUT_2 = new WishInput(
     TestData.WISH_2.getTitle(),
-    TestData.WISH_2.getDescription(),
-    TestData.WISH_2.getCoverImageUrl());
+    TestData.WISH_2.getContent(),
+    TestData.WISH_2.getCoverImageUrl(),
+    TestData.WISH_2.getAuthorId());
   public static final WishInput WISH_INPUT_3 = new WishInput(
     TestData.WISH_3.getTitle(),
-    TestData.WISH_3.getDescription(),
-    TestData.WISH_3.getCoverImageUrl());
+    TestData.WISH_3.getContent(),
+    TestData.WISH_3.getCoverImageUrl(),
+    TestData.WISH_3.getAuthorId());
   public static final WishInput WISH_INPUT_4 = new WishInput(
     TestData.WISH_4.getTitle(),
-    TestData.WISH_4.getDescription(),
-    TestData.WISH_4.getCoverImageUrl());
+    TestData.WISH_4.getContent(),
+    TestData.WISH_4.getCoverImageUrl(),
+    TestData.WISH_4.getAuthorId());
 
   /**
    * Some random data for update queries in tests
@@ -97,7 +91,7 @@ public final class TestData {
   public static final UpdateWishInput UPDATE_WISH_INPUT = new UpdateWishInput(
     WISH_4.getId(),
     WISH_4.getTitle(),
-    WISH_4.getDescription(),
+    WISH_4.getContent(),
     WISH_4.getCoverImageUrl());
 
   /**

@@ -21,7 +21,7 @@ public class UpdateWishInput {
   private String title;
 
   @ProtoField
-  private String description;
+  private String content;
 
   @ProtoField
   private String coverImageUrl;
@@ -32,12 +32,12 @@ public class UpdateWishInput {
   public UpdateWishInput(
     final long id,
     final String title,
-    final String description,
+    final String content,
     final String coverImageUrl
   ) {
     this.id = id;
     this.title = title;
-    this.description = description;
+    this.content = content;
     this.coverImageUrl = coverImageUrl;
   }
 
@@ -60,12 +60,12 @@ public class UpdateWishInput {
     this.title = title;
   }
 
-  public String getDescription() {
-    return description;
+  public String getContent() {
+    return content;
   }
 
-  public void setDescription(String description) {
-    this.description = description;
+  public void setContent(String content) {
+    this.content = content;
   }
 
   public String getCoverImageUrl() {
@@ -87,20 +87,20 @@ public class UpdateWishInput {
     UpdateWishInput that = (UpdateWishInput) o;
     return id == that.id &&
       title.equals(that.title) &&
-      description.equals(that.description) &&
+      content.equals(that.content) &&
       Objects.equals(coverImageUrl, that.coverImageUrl);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(title, description, coverImageUrl, id);
+    return Objects.hash(title, content, coverImageUrl, id);
   }
 
   @Override
   public String toString() {
     return "UpdateWishInput{" +
       "title='" + title + '\'' +
-      ", description='" + description + '\'' +
+      ", content='" + content + '\'' +
       ", coverImageUrl='" + coverImageUrl + '\'' +
       ", id=" + id +
       '}';

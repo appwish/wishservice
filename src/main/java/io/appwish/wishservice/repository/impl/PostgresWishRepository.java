@@ -23,8 +23,10 @@ public class PostgresWishRepository implements WishRepository {
 
   private static final String ID_COLUMN = "id";
   private static final String TITLE_COLUMN = "title";
-  private static final String DESCRIPTION_COLUMN = "description";
+  private static final String CONTENT_COLUMN = "content";
   private static final String COVER_IMAGE_URL_COLUMN = "cover_image_url";
+  private static final String AUTHOR_ID_COLUMN = "author_id";
+  private static final String URL_COLUMN = "url";
 
   private final PgPool client;
 
@@ -77,7 +79,7 @@ public class PostgresWishRepository implements WishRepository {
     final Promise<Wish> promise = Promise.promise();
 
     client.preparedQuery(Query.INSERT_WISH_QUERY.sql(),
-      Tuple.of(wish.getTitle(), wish.getDescription(), wish.getCoverImageUrl()),
+      Tuple.of(wish.getTitle(), wish.getContent(), wish.getCoverImageUrl(), wish.getAuthorId(), "hardcoded-for-now"),
       event -> {
         if (event.succeeded()) {
           if (event.result().iterator().hasNext()) {
@@ -118,7 +120,7 @@ public class PostgresWishRepository implements WishRepository {
     final Promise<Optional<Wish>> promise = Promise.promise();
 
     client.preparedQuery(Query.UPDATE_WISH_QUERY.sql(),
-      Tuple.of(wish.getTitle(), wish.getDescription(), wish.getCoverImageUrl(), wish.getId()),
+      Tuple.of(wish.getTitle(), wish.getContent(), wish.getCoverImageUrl(), wish.getId()),
       event -> {
         if (event.succeeded() && event.result().rowCount() == 1) {
           final Row row = event.result().iterator().next();
@@ -137,7 +139,9 @@ public class PostgresWishRepository implements WishRepository {
     return new Wish(
       row.getLong(ID_COLUMN),
       row.getString(TITLE_COLUMN),
-      row.getString(DESCRIPTION_COLUMN),
-      row.getString(COVER_IMAGE_URL_COLUMN));
+      row.getString(CONTENT_COLUMN),
+      row.getString(COVER_IMAGE_URL_COLUMN),
+      row.getLong(AUTHOR_ID_COLUMN),
+      row.getString(URL_COLUMN));
   }
 }

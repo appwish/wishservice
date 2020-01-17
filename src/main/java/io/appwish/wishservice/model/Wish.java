@@ -22,21 +22,24 @@ public class Wish {
   private String title;
 
   @ProtoField
-  private String description;
+  private String content;
 
   @ProtoField
   private String coverImageUrl;
 
-  public Wish(
-    final long id,
-    final String title,
-    final String description,
-    final String coverImageUrl
-  ) {
+  @ProtoField
+  private long authorId;
+
+  @ProtoField
+  private String url;
+
+  public Wish(final long id, final String title, final String content, final String coverImageUrl, final long authorId, final String url) {
     this.id = id;
     this.title = title;
-    this.description = description;
+    this.content = content;
     this.coverImageUrl = coverImageUrl;
+    this.authorId = authorId;
+    this.url = url;
   }
 
   public Wish() {
@@ -58,12 +61,12 @@ public class Wish {
     this.title = title;
   }
 
-  public String getDescription() {
-    return description;
+  public String getContent() {
+    return content;
   }
 
-  public void setDescription(String description) {
-    this.description = description;
+  public void setContent(String content) {
+    this.content = content;
   }
 
   public void setCoverImageUrl(String coverImageUrl) {
@@ -72,6 +75,22 @@ public class Wish {
 
   public String getCoverImageUrl() {
     return coverImageUrl;
+  }
+
+  public long getAuthorId() {
+    return authorId;
+  }
+
+  public void setAuthorId(long authorId) {
+    this.authorId = authorId;
+  }
+
+  public String getUrl() {
+    return url;
+  }
+
+  public void setUrl(String url) {
+    this.url = url;
   }
 
   @Override
@@ -84,23 +103,15 @@ public class Wish {
     }
     Wish wish = (Wish) o;
     return id == wish.id &&
+      authorId == wish.authorId &&
       title.equals(wish.title) &&
-      description.equals(wish.description) &&
-      Objects.equals(coverImageUrl, wish.coverImageUrl);
+      content.equals(wish.content) &&
+      Objects.equals(coverImageUrl, wish.coverImageUrl) &&
+      url.equals(wish.url);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, title, description, coverImageUrl);
-  }
-
-  @Override
-  public String toString() {
-    return "Wish{" +
-      "id=" + id +
-      ", title='" + title + '\'' +
-      ", description='" + description + '\'' +
-      ", coverImageUrl='" + coverImageUrl + '\'' +
-      '}';
+    return Objects.hash(id, title, content, coverImageUrl, authorId, url);
   }
 }

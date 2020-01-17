@@ -21,15 +21,19 @@ public class WishInput {
   private String title;
 
   @ProtoField
-  private String description;
+  private String content;
 
   @ProtoField
   private String coverImageUrl;
 
-  public WishInput(final String title, final String description, final String coverImageUrl) {
+  @ProtoField
+  private long authorId;
+
+  public WishInput(final String title, final String content, final String coverImageUrl, final long authorId) {
     this.title = title;
-    this.description = description;
+    this.content = content;
     this.coverImageUrl = coverImageUrl;
+    this.authorId = authorId;
   }
 
   public WishInput() {
@@ -43,12 +47,12 @@ public class WishInput {
     this.title = title;
   }
 
-  public String getDescription() {
-    return description;
+  public String getContent() {
+    return content;
   }
 
-  public void setDescription(String description) {
-    this.description = description;
+  public void setContent(String content) {
+    this.content = content;
   }
 
   public String getCoverImageUrl() {
@@ -57,6 +61,14 @@ public class WishInput {
 
   public void setCoverImageUrl(String coverImageUrl) {
     this.coverImageUrl = coverImageUrl;
+  }
+
+  public long getAuthorId() {
+    return authorId;
+  }
+
+  public void setAuthorId(long authorId) {
+    this.authorId = authorId;
   }
 
   @Override
@@ -68,22 +80,24 @@ public class WishInput {
       return false;
     }
     WishInput wishInput = (WishInput) o;
-    return title.equals(wishInput.title) &&
-      description.equals(wishInput.description) &&
+    return authorId == wishInput.authorId &&
+      title.equals(wishInput.title) &&
+      content.equals(wishInput.content) &&
       Objects.equals(coverImageUrl, wishInput.coverImageUrl);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(title, description, coverImageUrl);
+    return Objects.hash(title, content, coverImageUrl, authorId);
   }
 
   @Override
   public String toString() {
     return "WishInput{" +
       "title='" + title + '\'' +
-      ", description='" + description + '\'' +
+      ", content='" + content + '\'' +
       ", coverImageUrl='" + coverImageUrl + '\'' +
+      ", authorId=" + authorId +
       '}';
   }
 }
