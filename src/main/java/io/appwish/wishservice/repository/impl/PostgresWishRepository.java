@@ -13,6 +13,7 @@ import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.Tuple;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -78,8 +79,9 @@ public class PostgresWishRepository implements WishRepository {
   public Future<Wish> addOne(final WishInput wish) {
     final Promise<Wish> promise = Promise.promise();
 
+    final Random random = new Random(); // TODO remove hardcoded values
     client.preparedQuery(Query.INSERT_WISH_QUERY.sql(),
-      Tuple.of(wish.getTitle(), wish.getContent(), wish.getCoverImageUrl(), wish.getAuthorId(), "hardcoded-for-now"),
+      Tuple.of(wish.getTitle(), wish.getContent(), wish.getCoverImageUrl(), random.nextLong(), "https://appwish.org/posts/" + random.nextLong()),
       event -> {
         if (event.succeeded()) {
           if (event.result().iterator().hasNext()) {

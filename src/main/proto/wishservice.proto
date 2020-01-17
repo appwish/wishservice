@@ -49,7 +49,6 @@ message WishInputProto {
   string title = 1;
   string content = 2;
   string coverImageUrl = 3;
-  string author_id = 4;
 }
 
 message UpdateWishInputProto {

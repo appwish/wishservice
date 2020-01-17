@@ -26,14 +26,10 @@ public class WishInput {
   @ProtoField
   private String coverImageUrl;
 
-  @ProtoField
-  private long authorId;
-
-  public WishInput(final String title, final String content, final String coverImageUrl, final long authorId) {
+  public WishInput(final String title, final String content, final String coverImageUrl) {
     this.title = title;
     this.content = content;
     this.coverImageUrl = coverImageUrl;
-    this.authorId = authorId;
   }
 
   public WishInput() {
@@ -63,14 +59,6 @@ public class WishInput {
     this.coverImageUrl = coverImageUrl;
   }
 
-  public long getAuthorId() {
-    return authorId;
-  }
-
-  public void setAuthorId(long authorId) {
-    this.authorId = authorId;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -80,15 +68,14 @@ public class WishInput {
       return false;
     }
     WishInput wishInput = (WishInput) o;
-    return authorId == wishInput.authorId &&
-      title.equals(wishInput.title) &&
+    return title.equals(wishInput.title) &&
       content.equals(wishInput.content) &&
       Objects.equals(coverImageUrl, wishInput.coverImageUrl);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(title, content, coverImageUrl, authorId);
+    return Objects.hash(title, content, coverImageUrl);
   }
 
   @Override
@@ -97,7 +84,6 @@ public class WishInput {
       "title='" + title + '\'' +
       ", content='" + content + '\'' +
       ", coverImageUrl='" + coverImageUrl + '\'' +
-      ", authorId=" + authorId +
       '}';
   }
 }

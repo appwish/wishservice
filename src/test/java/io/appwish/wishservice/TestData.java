@@ -67,23 +67,19 @@ public final class TestData {
   public static final WishInput WISH_INPUT_1 = new WishInput(
     TestData.WISH_1.getTitle(),
     TestData.WISH_1.getContent(),
-    TestData.WISH_1.getCoverImageUrl(),
-    TestData.WISH_1.getAuthorId());
+    TestData.WISH_1.getCoverImageUrl());
   public static final WishInput WISH_INPUT_2 = new WishInput(
     TestData.WISH_2.getTitle(),
     TestData.WISH_2.getContent(),
-    TestData.WISH_2.getCoverImageUrl(),
-    TestData.WISH_2.getAuthorId());
+    TestData.WISH_2.getCoverImageUrl());
   public static final WishInput WISH_INPUT_3 = new WishInput(
     TestData.WISH_3.getTitle(),
     TestData.WISH_3.getContent(),
-    TestData.WISH_3.getCoverImageUrl(),
-    TestData.WISH_3.getAuthorId());
+    TestData.WISH_3.getCoverImageUrl());
   public static final WishInput WISH_INPUT_4 = new WishInput(
     TestData.WISH_4.getTitle(),
     TestData.WISH_4.getContent(),
-    TestData.WISH_4.getCoverImageUrl(),
-    TestData.WISH_4.getAuthorId());
+    TestData.WISH_4.getCoverImageUrl());
 
   /**
    * Some random data for update queries in tests

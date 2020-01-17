@@ -68,8 +68,7 @@ class PostgresWishRepositoryTest {
     final WishInput wishInput = new WishInput(
       TestData.SOME_TITLE,
       TestData.SOME_CONTENT,
-      TestData.SOME_COVER_IMAGE_URL,
-      TestData.SOME_AUTHOR_ID);
+      TestData.SOME_COVER_IMAGE_URL);
 
     // when
     repository.addOne(wishInput)
@@ -92,8 +91,7 @@ class PostgresWishRepositoryTest {
     final WishInput wishInput = new WishInput(
       TestData.SOME_TITLE,
       TestData.SOME_CONTENT,
-      TestData.SOME_COVER_IMAGE_URL,
-      TestData.SOME_AUTHOR_ID);
+      TestData.SOME_COVER_IMAGE_URL);
     context.assertComplete(repository.addOne(wishInput)).setHandler(event -> {
 
       // when
