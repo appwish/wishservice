@@ -10,7 +10,7 @@ COPY gradle $APP_HOME/gradle
 RUN ./gradlew build || return 0
 
 COPY . .
-RUN ./gradlew shadowJar
+RUN ./gradlew test && ./gradlew shadowJar
 
 FROM azul/zulu-openjdk-alpine:11-jre
 
