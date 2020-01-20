@@ -48,8 +48,7 @@ public class GrpcServiceImpl extends WishServiceGrpc.WishServiceVertxImplBase {
       Address.FIND_ONE_WISH.get(), converter.toDomain(WishQuery.class, request),
       event -> {
         if (event.succeeded() && event.result().body().isPresent()) {
-          response.complete(
-            converter.toProtobuf(WishReplyProto.class, new WishReply(event.result().body().get())));
+          response.complete(converter.toProtobuf(WishReplyProto.class, new WishReply(event.result().body().get())));
         } else if (event.succeeded()) {
           response.complete();
         } else {
@@ -89,8 +88,7 @@ public class GrpcServiceImpl extends WishServiceGrpc.WishServiceVertxImplBase {
       Address.CREATE_ONE_WISH.get(), converter.toDomain(WishInput.class, request),
       event -> {
         if (event.succeeded()) {
-          response.complete(
-            converter.toProtobuf(WishReplyProto.class, new WishReply(event.result().body())));
+          response.complete(converter.toProtobuf(WishReplyProto.class, new WishReply(event.result().body())));
         } else {
           response.fail(event.cause());
         }
@@ -108,8 +106,7 @@ public class GrpcServiceImpl extends WishServiceGrpc.WishServiceVertxImplBase {
       Address.UPDATE_ONE_WISH.get(), converter.toDomain(UpdateWishInput.class, request),
       event -> {
         if (event.succeeded() && event.result().body().isPresent()) {
-          response.complete(converter.
-            toProtobuf(WishReplyProto.class, new WishReply(event.result().body().get())));
+          response.complete(converter.toProtobuf(WishReplyProto.class, new WishReply(event.result().body().get())));
         } else if (event.succeeded()) {
           response.complete();
         } else {
@@ -129,8 +126,7 @@ public class GrpcServiceImpl extends WishServiceGrpc.WishServiceVertxImplBase {
       Address.DELETE_ONE_WISH.get(), converter.toDomain(WishQuery.class, request),
       event -> {
         if (event.succeeded()) {
-          response.complete(converter.toProtobuf(
-            WishDeleteReplyProto.class, new WishDeleteReply(event.result().body())));
+          response.complete(converter.toProtobuf(WishDeleteReplyProto.class, new WishDeleteReply(event.result().body())));
         } else {
           response.fail(event.cause());
         }

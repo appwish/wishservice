@@ -3,7 +3,7 @@
   "appPort": 8080,
   "appHost": "wishservice",
   "dbPort": 5432,
-  "dbHost": "localhost",
+  "dbHost": "postgres",
   "dbName": "postgres",
   "dbUser": "postgres",
   "dbPassword": "postgres"

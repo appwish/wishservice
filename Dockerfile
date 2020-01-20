@@ -10,11 +10,11 @@ COPY gradle $APP_HOME/gradle
 RUN ./gradlew build || return 0
 
 COPY . .
-RUN ./gradlew test && ./gradlew shadowJar
+RUN ./gradlew shadowJar
 
 FROM azul/zulu-openjdk-alpine:11-jre
 
 COPY --from=builder /usr/app/build/libs/wishservice-1.0.0-SNAPSHOT-fat.jar wishservice.jar
 
-EXPOSE 8000
+EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "wishservice.jar"]
