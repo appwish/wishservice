@@ -1,0 +1,15 @@
+application:
+  name: wishservice
+  project: appwish
+  cloud_region: aws/eu-west-3
+  publicly_accessible: true
+databases:
+- type: postgresql
+  version: "11.5"
+  name: my-postgresql-6954440
+routers:
+- name: main
+  routes:
+  - application_name: wishservice
+    paths:
+    - /*
