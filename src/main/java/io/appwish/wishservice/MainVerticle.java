@@ -3,6 +3,7 @@ package io.appwish.wishservice;
 import io.appwish.wishservice.eventbus.EventBusConfigurer;
 import io.appwish.wishservice.repository.WishRepository;
 import io.appwish.wishservice.repository.impl.PostgresWishRepository;
+import io.appwish.wishservice.repository.impl.Query;
 import io.appwish.wishservice.verticle.DatabaseVerticle;
 import io.appwish.wishservice.verticle.GrpcVerticle;
 import io.vertx.config.ConfigRetriever;
@@ -55,6 +56,9 @@ public class MainVerticle extends AbstractVerticle {
       final EventBusConfigurer util = new EventBusConfigurer(vertx.eventBus());
 
       util.registerCodecs();
+
+      // TODO It's here just for development purposes
+      client.preparedQuery(Query.CREATE_WISH_TABLE.sql(), query -> { });
 
       CompositeFuture.all(
         deployDatabaseVerticle(repository),
