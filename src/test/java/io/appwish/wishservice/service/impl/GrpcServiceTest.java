@@ -163,7 +163,7 @@ class GrpcServiceTest {
     final Promise<WishReplyProto> promise = Promise.promise();
     final WishInputProto inputProto = WishInputProto.newBuilder()
       .setTitle(TestData.SOME_TITLE)
-      .setContent(TestData.SOME_CONTENT)
+      .setMarkdown(TestData.SOME_MARKDOWN)
       .setCoverImageUrl(TestData.SOME_COVER_IMAGE_URL)
       .build();
     vertx.eventBus().consumer(Address.CREATE_ONE_WISH.get(), event -> {
@@ -190,7 +190,7 @@ class GrpcServiceTest {
     final Promise<WishReplyProto> promise = Promise.promise();
     final WishInputProto inputProto = WishInputProto.newBuilder()
       .setTitle(TestData.SOME_TITLE)
-      .setContent(TestData.SOME_CONTENT)
+      .setMarkdown(TestData.SOME_MARKDOWN)
       .setCoverImageUrl(TestData.SOME_COVER_IMAGE_URL)
       .build();
     vertx.eventBus().consumer(Address.CREATE_ONE_WISH.get(), event -> {
@@ -218,7 +218,7 @@ class GrpcServiceTest {
       .setId(TestData.WISH_3.getId())
       .setCoverImageUrl(TestData.WISH_3.getCoverImageUrl())
       .setTitle(TestData.WISH_3.getTitle())
-      .setContent(TestData.WISH_3.getContent())
+      .setMarkdown(TestData.WISH_3.getMarkdown())
       .build();
     vertx.eventBus().consumer(Address.UPDATE_ONE_WISH.get(), event -> {
       event.reply(Optional.of(TestData.WISH_3),
@@ -248,7 +248,7 @@ class GrpcServiceTest {
       .setId(TestData.WISH_3.getId())
       .setCoverImageUrl(TestData.WISH_3.getCoverImageUrl())
       .setTitle(TestData.WISH_3.getTitle())
-      .setContent(TestData.WISH_3.getContent())
+      .setMarkdown(TestData.WISH_3.getMarkdown())
       .build();
     vertx.eventBus().consumer(Address.UPDATE_ONE_WISH.get(), event -> {
       event.reply(Optional.empty(), new DeliveryOptions().setCodecName(Codec.WISH.getCodecName()));
@@ -274,7 +274,7 @@ class GrpcServiceTest {
       .setId(TestData.WISH_3.getId())
       .setCoverImageUrl(TestData.WISH_3.getCoverImageUrl())
       .setTitle(TestData.WISH_3.getTitle())
-      .setContent(TestData.WISH_3.getContent())
+      .setMarkdown(TestData.WISH_3.getMarkdown())
       .build();
     vertx.eventBus().consumer(Address.UPDATE_ONE_WISH.get(), event -> {
       event.fail(0, TestData.ERROR_MESSAGE);

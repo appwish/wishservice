@@ -1,7 +1,11 @@
 package io.appwish.wishservice.model;
 
 import io.appwish.grpc.WishProto;
+
 import java.util.Objects;
+
+import com.google.protobuf.Timestamp;
+
 import net.badata.protobuf.converter.annotation.ProtoClass;
 import net.badata.protobuf.converter.annotation.ProtoField;
 
@@ -22,7 +26,10 @@ public class Wish {
   private String title;
 
   @ProtoField
-  private String content;
+  private String markdown;
+
+  @ProtoField
+  private String html;
 
   @ProtoField
   private String coverImageUrl;
@@ -31,15 +38,24 @@ public class Wish {
   private long authorId;
 
   @ProtoField
-  private String url;
+  private String slug;
 
-  public Wish(final long id, final String title, final String content, final String coverImageUrl, final long authorId, final String url) {
+  @ProtoField
+  private Timestamp createdAt;
+
+  @ProtoField
+  private Timestamp updatedAt;
+
+  public Wish(final long id, final String title, final String markdown, final String coverImageUrl, final long authorId, final String slug, final String html, final Timestamp createdAt, final Timestamp updatedAt) {
     this.id = id;
     this.title = title;
-    this.content = content;
+    this.markdown = markdown;
     this.coverImageUrl = coverImageUrl;
     this.authorId = authorId;
-    this.url = url;
+    this.slug = slug;
+    this.html = html;
+    this.updatedAt = updatedAt;
+    this.createdAt = createdAt;
   }
 
   public Wish() {
@@ -61,12 +77,12 @@ public class Wish {
     this.title = title;
   }
 
-  public String getContent() {
-    return content;
+  public String getMarkdown() {
+    return markdown;
   }
 
-  public void setContent(String content) {
-    this.content = content;
+  public void setMarkdown(String markdown) {
+    this.markdown = markdown;
   }
 
   public void setCoverImageUrl(String coverImageUrl) {
@@ -85,12 +101,36 @@ public class Wish {
     this.authorId = authorId;
   }
 
-  public String getUrl() {
-    return url;
+  public String getSlug() {
+    return slug;
   }
 
-  public void setUrl(String url) {
-    this.url = url;
+  public void setSlug(String slug) {
+    this.slug = slug;
+  }
+
+  public String getHtml() {
+    return html;
+  }
+
+  public void setHtml(String html) {
+    this.html = html;
+  }
+
+  public Timestamp getCreatedAt() {
+    return createdAt;
+  }
+
+  public void setCreatedAt(Timestamp createdAt) {
+    this.createdAt = createdAt;
+  }
+
+  public Timestamp getUpdatedAt() {
+    return updatedAt;
+  }
+
+  public void setUpdatedAt(Timestamp updatedAt) {
+    this.updatedAt = updatedAt;
   }
 
   @Override
@@ -105,13 +145,32 @@ public class Wish {
     return id == wish.id &&
       authorId == wish.authorId &&
       title.equals(wish.title) &&
-      content.equals(wish.content) &&
+      markdown.equals(wish.markdown) &&
+      Objects.equals(html, wish.html) &&
       Objects.equals(coverImageUrl, wish.coverImageUrl) &&
-      url.equals(wish.url);
+      slug.equals(wish.slug) &&
+      Objects.equals(createdAt, wish.createdAt) &&
+      Objects.equals(updatedAt, wish.updatedAt);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, title, content, coverImageUrl, authorId, url);
+    return Objects
+      .hash(id, title, markdown, html, coverImageUrl, authorId, slug, createdAt, updatedAt);
+  }
+
+  @Override
+  public String toString() {
+    return "Wish{" +
+      "id=" + id +
+      ", title='" + title + '\'' +
+      ", markdown='" + markdown + '\'' +
+      ", html='" + html + '\'' +
+      ", coverImageUrl='" + coverImageUrl + '\'' +
+      ", authorId=" + authorId +
+      ", slug='" + slug + '\'' +
+      ", createdAt=" + createdAt +
+      ", updatedAt=" + updatedAt +
+      '}';
   }
 }

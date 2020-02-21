@@ -21,14 +21,14 @@ public class WishInput {
   private String title;
 
   @ProtoField
-  private String content;
+  private String markdown;
 
   @ProtoField
   private String coverImageUrl;
 
-  public WishInput(final String title, final String content, final String coverImageUrl) {
+  public WishInput(final String title, final String markdown, final String coverImageUrl) {
     this.title = title;
-    this.content = content;
+    this.markdown = markdown;
     this.coverImageUrl = coverImageUrl;
   }
 
@@ -43,12 +43,12 @@ public class WishInput {
     this.title = title;
   }
 
-  public String getContent() {
-    return content;
+  public String getMarkdown() {
+    return markdown;
   }
 
-  public void setContent(String content) {
-    this.content = content;
+  public void setMarkdown(String markdown) {
+    this.markdown = markdown;
   }
 
   public String getCoverImageUrl() {
@@ -69,20 +69,20 @@ public class WishInput {
     }
     WishInput wishInput = (WishInput) o;
     return title.equals(wishInput.title) &&
-      content.equals(wishInput.content) &&
+      markdown.equals(wishInput.markdown) &&
       Objects.equals(coverImageUrl, wishInput.coverImageUrl);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(title, content, coverImageUrl);
+    return Objects.hash(title, markdown, coverImageUrl);
   }
 
   @Override
   public String toString() {
     return "WishInput{" +
       "title='" + title + '\'' +
-      ", content='" + content + '\'' +
+      ", markdown='" + markdown + '\'' +
       ", coverImageUrl='" + coverImageUrl + '\'' +
       '}';
   }

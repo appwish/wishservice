@@ -67,7 +67,7 @@ class PostgresWishRepositoryTest {
     // given
     final WishInput wishInput = new WishInput(
       TestData.SOME_TITLE,
-      TestData.SOME_CONTENT,
+      TestData.SOME_MARKDOWN,
       TestData.SOME_COVER_IMAGE_URL);
 
     // when
@@ -78,7 +78,7 @@ class PostgresWishRepositoryTest {
         context.verify(() -> {
           assertTrue(event.succeeded());
           assertEquals(TestData.SOME_TITLE, event.result().getTitle());
-          assertEquals(TestData.SOME_CONTENT, event.result().getContent());
+          assertEquals(TestData.SOME_MARKDOWN, event.result().getMarkdown());
           assertEquals(TestData.SOME_COVER_IMAGE_URL, event.result().getCoverImageUrl());
           context.completeNow();
         });
@@ -90,7 +90,7 @@ class PostgresWishRepositoryTest {
     // given
     final WishInput wishInput = new WishInput(
       TestData.SOME_TITLE,
-      TestData.SOME_CONTENT,
+      TestData.SOME_MARKDOWN,
       TestData.SOME_COVER_IMAGE_URL);
     context.assertComplete(repository.addOne(wishInput)).setHandler(event -> {
 
@@ -102,7 +102,7 @@ class PostgresWishRepositoryTest {
           assertTrue(query.succeeded());
           assertTrue(query.result().isPresent());
           assertEquals(TestData.SOME_TITLE, query.result().get().getTitle());
-          assertEquals(TestData.SOME_CONTENT, query.result().get().getContent());
+          assertEquals(TestData.SOME_MARKDOWN, query.result().get().getMarkdown());
           assertEquals(TestData.SOME_COVER_IMAGE_URL, query.result().get().getCoverImageUrl());
           context.completeNow();
         });
@@ -171,7 +171,7 @@ class PostgresWishRepositoryTest {
     // given
     final UpdateWishInput updated = new UpdateWishInput(
       TestData.NON_EXISTING_ID,
-      TestData.WISH_2.getTitle(), TestData.WISH_2.getContent(),
+      TestData.WISH_2.getTitle(), TestData.WISH_2.getMarkdown(),
       TestData.WISH_2.getCoverImageUrl());
 
     // when
@@ -193,7 +193,7 @@ class PostgresWishRepositoryTest {
     context.assertComplete(repository.addOne(TestData.WISH_INPUT_1)).setHandler(event -> {
       final long id = event.result().getId();
       final UpdateWishInput updated = new UpdateWishInput(id, TestData.WISH_2.getTitle(),
-        TestData.WISH_1.getContent(), TestData.WISH_1.getCoverImageUrl());
+        TestData.WISH_1.getMarkdown(), TestData.WISH_1.getCoverImageUrl());
 
       // when
       repository.updateOne(updated).setHandler(query -> {
@@ -203,7 +203,7 @@ class PostgresWishRepositoryTest {
           assertTrue(query.succeeded());
           assertTrue(query.result().isPresent());
           assertEquals(TestData.WISH_2.getTitle(), query.result().get().getTitle());
-          assertEquals(TestData.WISH_1.getContent(), query.result().get().getContent());
+          assertEquals(TestData.WISH_1.getMarkdown(), query.result().get().getMarkdown());
           assertEquals(TestData.WISH_1.getCoverImageUrl(), query.result().get().getCoverImageUrl());
           assertEquals(id, query.result().get().getId());
           context.completeNow();
@@ -220,7 +220,7 @@ class PostgresWishRepositoryTest {
     final UpdateWishInput updateWishInput = new UpdateWishInput(
       TestData.SOME_ID,
       TestData.SOME_TITLE,
-      TestData.SOME_CONTENT,
+      TestData.SOME_MARKDOWN,
       TestData.SOME_COVER_IMAGE_URL);
 
     // database down
@@ -244,7 +244,7 @@ class PostgresWishRepositoryTest {
 
   private static boolean isInList(final Wish wish, final List<Wish> list) {
     return list.stream().anyMatch(wishFromList ->
-      wish.getContent().equals(wishFromList.getContent()) &&
+      wish.getMarkdown().equals(wishFromList.getMarkdown()) &&
         wish.getTitle().equals(wishFromList.getTitle()) &&
         wish.getCoverImageUrl().equals(wishFromList.getCoverImageUrl()));
   }

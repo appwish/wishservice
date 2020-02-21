@@ -11,11 +11,15 @@ import io.vertx.core.Promise;
 import io.vertx.pgclient.PgPool;
 import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.Tuple;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
+import com.google.protobuf.Timestamp;
 
 /**
  * Enables storing wishes in PostgreSQL
@@ -24,10 +28,13 @@ public class PostgresWishRepository implements WishRepository {
 
   private static final String ID_COLUMN = "id";
   private static final String TITLE_COLUMN = "title";
-  private static final String CONTENT_COLUMN = "content";
+  private static final String MARKDOWN_COLUMN = "markdown";
+  private static final String HTML_COLUMN = "html";
   private static final String COVER_IMAGE_URL_COLUMN = "cover_image_url";
   private static final String AUTHOR_ID_COLUMN = "author_id";
-  private static final String URL_COLUMN = "url";
+  private static final String SLUG_COLUMN = "slug";
+  private static final String CREATED_AT_COLUMN = "created_at";
+  private static final String UPDATED_AT_COLUMN = "updated_at";
 
   private final PgPool client;
 
@@ -79,9 +86,11 @@ public class PostgresWishRepository implements WishRepository {
   public Future<Wish> addOne(final WishInput wish) {
     final Promise<Wish> promise = Promise.promise();
 
+    // TODO should parse markdown to HTML
     final Random random = new Random(); // TODO remove hardcoded values
+    final LocalDateTime now = LocalDateTime.now();
     client.preparedQuery(Query.INSERT_WISH_QUERY.sql(),
-      Tuple.of(wish.getTitle(), wish.getContent(), wish.getCoverImageUrl(), random.nextLong(), "https://appwish.org/posts/" + random.nextLong()),
+      Tuple.of(wish.getTitle(), wish.getMarkdown(), wish.getCoverImageUrl(), random.nextLong(), "https://appwish.org/posts/" + random.nextLong(), "HTML", now, now),
       event -> {
         if (event.succeeded()) {
           if (event.result().iterator().hasNext()) {
@@ -121,8 +130,9 @@ public class PostgresWishRepository implements WishRepository {
   public Future<Optional<Wish>> updateOne(final UpdateWishInput wish) {
     final Promise<Optional<Wish>> promise = Promise.promise();
 
+    // TODO should parse and save Markdown -> HTML
     client.preparedQuery(Query.UPDATE_WISH_QUERY.sql(),
-      Tuple.of(wish.getTitle(), wish.getContent(), wish.getCoverImageUrl(), wish.getId()),
+      Tuple.of(wish.getTitle(), wish.getMarkdown(), wish.getCoverImageUrl(), "HARDCODED HTML", LocalDateTime.now(), wish.getId()),
       event -> {
         if (event.succeeded() && event.result().rowCount() == 1) {
           final Row row = event.result().iterator().next();
@@ -138,12 +148,17 @@ public class PostgresWishRepository implements WishRepository {
   }
 
   private Wish wishFromRow(final Row row) {
+    final LocalDateTime createdAt = row.getLocalDateTime(CREATED_AT_COLUMN);
+    final LocalDateTime updatedAt = row.getLocalDateTime(UPDATED_AT_COLUMN);
     return new Wish(
       row.getLong(ID_COLUMN),
       row.getString(TITLE_COLUMN),
-      row.getString(CONTENT_COLUMN),
+      row.getString(MARKDOWN_COLUMN),
       row.getString(COVER_IMAGE_URL_COLUMN),
       row.getLong(AUTHOR_ID_COLUMN),
-      row.getString(URL_COLUMN));
+      row.getString(SLUG_COLUMN),
+      row.getString(HTML_COLUMN),
+		Timestamp.newBuilder().setNanos(createdAt.toInstant(ZoneOffset.UTC).getNano()).setSeconds(createdAt.toInstant(ZoneOffset.UTC).getEpochSecond()).build(),
+		Timestamp.newBuilder().setNanos(updatedAt.toInstant(ZoneOffset.UTC).getNano()).setSeconds(updatedAt.toInstant(ZoneOffset.UTC).getEpochSecond()).build());
   }
 }
