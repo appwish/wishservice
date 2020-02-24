@@ -7,6 +7,8 @@ import io.appwish.wishservice.repository.impl.Query;
 import io.appwish.wishservice.verticle.DatabaseVerticle;
 import io.appwish.wishservice.verticle.GrpcVerticle;
 import io.vertx.config.ConfigRetriever;
+import io.vertx.config.ConfigRetrieverOptions;
+import io.vertx.config.ConfigStoreOptions;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.DeploymentOptions;
@@ -33,7 +35,10 @@ public class MainVerticle extends AbstractVerticle {
 
   @Override
   public void start(final Promise<Void> startPromise) {
-    final ConfigRetriever retriever = ConfigRetriever.create(vertx);
+    final ConfigStoreOptions envs = new ConfigStoreOptions().setType("env");
+    final ConfigStoreOptions fileStore = new ConfigStoreOptions().setType("file").setConfig(new JsonObject().put("path", "conf/config.json"));
+    final ConfigRetrieverOptions options = new ConfigRetrieverOptions().addStore(fileStore).addStore(envs);
+    final ConfigRetriever retriever = ConfigRetriever.create(vertx, options);
 
     retriever.getConfig(event -> {
       final JsonObject config = event.result();
