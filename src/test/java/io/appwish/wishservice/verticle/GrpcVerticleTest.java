@@ -12,6 +12,7 @@ import io.grpc.ManagedChannel;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.eventbus.DeliveryOptions;
+import io.vertx.core.json.JsonObject;
 import io.vertx.grpc.VertxChannelBuilder;
 import io.vertx.junit5.VertxExtension;
 import io.vertx.junit5.VertxTestContext;
@@ -27,9 +28,8 @@ class GrpcVerticleTest {
     final EventBusConfigurer util = new EventBusConfigurer(vertx.eventBus());
     final ManagedChannel channel = VertxChannelBuilder.forAddress(vertx, TestData.APP_HOST, TestData.APP_PORT).usePlaintext(true).build();
     final WishServiceGrpc.WishServiceVertxStub serviceStub = new WishServiceGrpc.WishServiceVertxStub(channel);
-    vertx.deployVerticle(new GrpcVerticle(), new DeploymentOptions(), context.completing());
-    vertx.eventBus().consumer(Address.FIND_ALL_WISHES.get(),
-      event -> event.reply(TestData.WISHES, new DeliveryOptions().setCodecName(Codec.WISH.getCodecName())));
+    vertx.deployVerticle(new GrpcVerticle(new JsonObject().put("appHost", "0.0.0.0").put("appPort", 8080)), new DeploymentOptions(), context.completing());
+    vertx.eventBus().consumer(Address.FIND_ALL_WISHES.get(), event -> event.reply(TestData.WISHES, new DeliveryOptions().setCodecName(Codec.WISH.getCodecName())));
 
     util.registerCodecs();
 

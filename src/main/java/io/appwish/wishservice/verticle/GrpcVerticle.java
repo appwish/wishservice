@@ -20,31 +20,32 @@ public class GrpcVerticle extends AbstractVerticle {
   private static final String APP_PORT = "appPort";
   private static final String APP_HOST = "appHost";
 
+  private final JsonObject config;
+
+  public GrpcVerticle(final JsonObject config) {
+    this.config = config;
+  }
+
   @Override
   public void start(final Promise<Void> startPromise) throws Exception {
-    final ConfigRetriever retriever = ConfigRetriever.create(vertx);
     final BindableService grpcWishService = new GrpcServiceImpl(vertx.eventBus());
+    final String appHost = config.getString(APP_HOST);
+    final Integer appPort = config.getInteger(APP_PORT);
 
-    retriever.getConfig(event -> {
-      final JsonObject config = event.result();
-      final String appHost = config.getString(APP_HOST);
-      final Integer appPort = config.getInteger(APP_PORT);
+    final VertxServer server = VertxServerBuilder
+      .forAddress(vertx, appHost, appPort)
+      .addService(grpcWishService)
+      .build();
 
-      final VertxServer server = VertxServerBuilder
-        .forAddress(vertx, appHost, appPort)
-        .addService(grpcWishService)
-        .build();
-
-      server.start(asyncResult -> {
-        if (asyncResult.succeeded()) {
-          LOG.info("GrpcServiceImpl gRPC server started on port: " + appPort);
-          startPromise.complete();
-        } else {
-          LOG.error(
-            "Could not start GrpcServiceImpl gRPC server: " + asyncResult.cause().getMessage());
-          startPromise.fail(asyncResult.cause());
-        }
-      });
+    server.start(asyncResult -> {
+      if (asyncResult.succeeded()) {
+        LOG.info("GrpcServiceImpl gRPC server started on host={} and port={}", appHost, appPort);
+        startPromise.complete();
+      } else {
+        LOG.error(
+          "Could not start GrpcServiceImpl gRPC server: " + asyncResult.cause().getMessage());
+        startPromise.fail(asyncResult.cause());
+      }
     });
   }
 }

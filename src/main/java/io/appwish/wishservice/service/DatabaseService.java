@@ -52,7 +52,7 @@ public class DatabaseService {
       if (query.succeeded()) {
         event.reply(query.result());
       } else {
-        event.fail(1, "Could not delete the wish from the database");
+        event.fail(1, query.cause().getMessage());
       }
     };
   }
@@ -63,7 +63,7 @@ public class DatabaseService {
       if (query.succeeded()) {
         event.reply(query.result(), new DeliveryOptions().setCodecName(Codec.WISH.getCodecName()));
       } else {
-        event.fail(1, "Error updating the wish in the database");
+        event.fail(1, query.cause().getMessage());
       }
     };
   }
@@ -73,7 +73,7 @@ public class DatabaseService {
       if (query.succeeded()) {
         event.reply(query.result());
       } else {
-        event.fail(1, "Error adding the wish to the database");
+        event.fail(1, query.cause().getMessage());
       }
     };
   }
@@ -83,7 +83,7 @@ public class DatabaseService {
       if (query.succeeded()) {
         event.reply(query.result(), new DeliveryOptions().setCodecName(Codec.WISH.getCodecName()));
       } else {
-        event.fail(1, "Error fetching the wish from the database");
+        event.fail(1, query.cause().getMessage());
       }
     };
   }
@@ -94,7 +94,7 @@ public class DatabaseService {
         event.reply(query.result(),
           new DeliveryOptions().setCodecName(Codec.WISH.getCodecName()));
       } else {
-        event.fail(1, "Error fetching wishes from the database");
+        event.fail(1, query.cause().getMessage());
       }
     };
   }

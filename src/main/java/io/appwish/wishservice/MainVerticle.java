@@ -48,6 +48,9 @@ public class MainVerticle extends AbstractVerticle {
       final String databaseUser = config.getString(DATABASE_USER);
       final String databasePassword = config.getString(DATABASE_PASSWORD);
 
+      LOG.info("Preparing Postgres connection options: host={}, port={}, name={}, user={}, password={}",
+        databaseHost, databasePort, databaseUser, databasePassword.charAt(0) + "*****" + databasePassword.charAt(databasePassword.length() -1));
+
       final PgConnectOptions connectOptions = new PgConnectOptions()
         .setPort(databasePort)
         .setHost(databaseHost)
@@ -67,7 +70,7 @@ public class MainVerticle extends AbstractVerticle {
 
       CompositeFuture.all(
         deployDatabaseVerticle(repository),
-        deployGrpcVerticle())
+        deployGrpcVerticle(config))
         .setHandler(ar -> {
           if (ar.succeeded()) {
             startPromise.complete();
@@ -79,10 +82,10 @@ public class MainVerticle extends AbstractVerticle {
     });
   }
 
-  private Future<Void> deployGrpcVerticle() {
+  private Future<Void> deployGrpcVerticle(final JsonObject config) {
     final Promise<Void> promise = Promise.promise();
 
-    vertx.deployVerticle(new GrpcVerticle(), new DeploymentOptions(), res -> {
+    vertx.deployVerticle(new GrpcVerticle(config), new DeploymentOptions(), res -> {
       if (res.failed()) {
         promise.fail(res.cause());
       } else {
