@@ -20,6 +20,7 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.pgclient.PgConnectOptions;
 import io.vertx.pgclient.PgPool;
 import io.vertx.sqlclient.PoolOptions;
+import java.util.Map;
 
 /**
  * Main verticle responsible for configuration and deploying all other verticles
@@ -47,6 +48,10 @@ public class MainVerticle extends AbstractVerticle {
       final String databaseName = config.getString(DATABASE_NAME);
       final String databaseUser = config.getString(DATABASE_USER);
       final String databasePassword = config.getString(DATABASE_PASSWORD);
+
+      LOG.info("******************************Environment Vars*****************************");
+      Map<String, String> enviorntmentVars  = System.getenv();
+      enviorntmentVars.entrySet().forEach(LOG::info);
 
       LOG.info("Preparing Postgres connection options: host=" + databaseHost + ", port=" + databasePort + ", name=" + databaseName + ", user=" + databaseUser + ", password=" + databasePassword.charAt(0) + "*****" + databasePassword.charAt(databasePassword.length() - 1));
 
