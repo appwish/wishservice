@@ -51,7 +51,7 @@ public class MainVerticle extends AbstractVerticle {
 
       LOG.info("******************************Environment Vars*****************************");
       Map<String, String> enviorntmentVars  = System.getenv();
-      enviorntmentVars.entrySet().forEach(LOG::info);
+      enviorntmentVars.entrySet().forEach(System.out::println);
 
       LOG.info("Preparing Postgres connection options: host=" + databaseHost + ", port=" + databasePort + ", name=" + databaseName + ", user=" + databaseUser + ", password=" + databasePassword.charAt(0) + "*****" + databasePassword.charAt(databasePassword.length() - 1));
 
