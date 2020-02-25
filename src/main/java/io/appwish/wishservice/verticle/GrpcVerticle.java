@@ -39,7 +39,7 @@ public class GrpcVerticle extends AbstractVerticle {
 
     server.start(asyncResult -> {
       if (asyncResult.succeeded()) {
-        LOG.info("GrpcServiceImpl gRPC server started on host={} and port={}", appHost, appPort);
+        LOG.info("GrpcServiceImpl gRPC server started on host=" + appHost + " and port=" + appPort);
         startPromise.complete();
       } else {
         LOG.error(

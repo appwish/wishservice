@@ -48,8 +48,7 @@ public class MainVerticle extends AbstractVerticle {
       final String databaseUser = config.getString(DATABASE_USER);
       final String databasePassword = config.getString(DATABASE_PASSWORD);
 
-      LOG.info("Preparing Postgres connection options: host={}, port={}, name={}, user={}, password={}",
-        databaseHost, databasePort, databaseUser, databasePassword.charAt(0) + "*****" + databasePassword.charAt(databasePassword.length() -1));
+      LOG.info("Preparing Postgres connection options: host=" + databaseHost + ", port=" + databasePort + ", name=" + databaseName + ", user=" + databaseUser + ", password=" + databasePassword.charAt(0) + "*****" + databasePassword.charAt(databasePassword.length() - 1));
 
       final PgConnectOptions connectOptions = new PgConnectOptions()
         .setPort(databasePort)
