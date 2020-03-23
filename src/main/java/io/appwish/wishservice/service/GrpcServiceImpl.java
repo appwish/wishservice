@@ -17,7 +17,9 @@ import io.appwish.wishservice.model.query.AllWishQuery;
 import io.appwish.wishservice.model.query.WishQuery;
 import io.appwish.wishservice.model.reply.WishDeleteReply;
 import io.appwish.wishservice.model.reply.WishReply;
+import io.appwish.wishservice.verticle.GrpcVerticle;
 import io.vertx.core.Promise;
+import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
 import java.util.List;
 import java.util.Optional;
@@ -43,7 +45,7 @@ public class GrpcServiceImpl extends WishServiceGrpc.WishServiceVertxImplBase {
    */
   @Override
   public void getWish(final WishQueryProto request, final Promise<WishReplyProto> response) {
-
+    final String userId = GrpcVerticle.USER_CONTEXT.get();
     eventBus.<Optional<Wish>>request(
       Address.FIND_ONE_WISH.get(), converter.toDomain(WishQuery.class, request),
       event -> {
@@ -61,9 +63,8 @@ public class GrpcServiceImpl extends WishServiceGrpc.WishServiceVertxImplBase {
    * This method gets invoked when other service (app, microservice) invokes stub.getAllWish(...)
    */
   @Override
-  public void getAllWish(final AllWishQueryProto request,
-    final Promise<AllWishReplyProto> response) {
-
+  public void getAllWish(final AllWishQueryProto request, final Promise<AllWishReplyProto> response) {
+    final String userId = GrpcVerticle.USER_CONTEXT.get();
     eventBus.<List<Wish>>request(
       Address.FIND_ALL_WISHES.get(), converter.toDomain(AllWishQuery.class, request),
       event -> {
@@ -83,9 +84,9 @@ public class GrpcServiceImpl extends WishServiceGrpc.WishServiceVertxImplBase {
    */
   @Override
   public void createWish(final WishInputProto request, final Promise<WishReplyProto> response) {
-
+    final String userId = GrpcVerticle.USER_CONTEXT.get();
     eventBus.<Wish>request(
-      Address.CREATE_ONE_WISH.get(), converter.toDomain(WishInput.class, request),
+      Address.CREATE_ONE_WISH.get(), converter.toDomain(WishInput.class, request), new DeliveryOptions().addHeader("userId", userId),
       event -> {
         if (event.succeeded()) {
           response.complete(converter.toProtobuf(WishReplyProto.class, new WishReply(event.result().body())));
@@ -99,9 +100,8 @@ public class GrpcServiceImpl extends WishServiceGrpc.WishServiceVertxImplBase {
    * This method gets invoked when other service (app, microservice) invokes stub.updateWish(...)
    */
   @Override
-  public void updateWish(final UpdateWishInputProto request,
-    final Promise<WishReplyProto> response) {
-
+  public void updateWish(final UpdateWishInputProto request, final Promise<WishReplyProto> response) {
+    final String userId = GrpcVerticle.USER_CONTEXT.get();
     eventBus.<Optional<Wish>>request(
       Address.UPDATE_ONE_WISH.get(), converter.toDomain(UpdateWishInput.class, request),
       event -> {
@@ -119,9 +119,8 @@ public class GrpcServiceImpl extends WishServiceGrpc.WishServiceVertxImplBase {
    * This method gets invoked when other service (app, microservice) invokes stub.deleteWish(...)
    */
   @Override
-  public void deleteWish(final WishQueryProto request,
-    final Promise<WishDeleteReplyProto> response) {
-
+  public void deleteWish(final WishQueryProto request, final Promise<WishDeleteReplyProto> response) {
+    final String userId = GrpcVerticle.USER_CONTEXT.get();
     eventBus.<Boolean>request(
       Address.DELETE_ONE_WISH.get(), converter.toDomain(WishQuery.class, request),
       event -> {

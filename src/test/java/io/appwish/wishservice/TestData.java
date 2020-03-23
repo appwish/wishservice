@@ -33,7 +33,7 @@ public final class TestData {
    * Some random values to be used to fill Wish fields in tests
    * */
   public static final long SOME_ID = 1;
-  public static final long SOME_AUTHOR_ID = 9999;
+  public static final String SOME_AUTHOR_ID = "9999";
   public static final String SOME_TITLE = "Title1";
   public static final String SOME_MARKDOWN = "# Gimme the app!";
   public static final String SOME_COVER_IMAGE_URL = "https://appwish.org/static/hardcoded";
@@ -59,9 +59,9 @@ public final class TestData {
    * Wishes to be reused in tests
    */
   public static final Wish WISH_1 = new Wish(SOME_ID, SOME_TITLE, SOME_MARKDOWN, SOME_COVER_IMAGE_URL, SOME_AUTHOR_ID, SOME_WISH_SLUG, SOME_HTML, SOME_TIMESTAMP, SOME_TIMESTAMP);
-  public static final Wish WISH_2 = new Wish(2, "title2", "desc2", "url2", 92, "posturl2", "<p>blabla</p>", SOME_TIMESTAMP, SOME_TIMESTAMP);
-  public static final Wish WISH_3 = new Wish(3, "title3", "desc3", "url3", 93, "posturl3", "<p>blabla</p>", SOME_TIMESTAMP, SOME_TIMESTAMP);
-  public static final Wish WISH_4 = new Wish(4, "title4", "desc4", "url4", 94, "posturl4", "<p>blabla</p>", SOME_TIMESTAMP, SOME_TIMESTAMP);
+  public static final Wish WISH_2 = new Wish(2, "title2", "desc2", "url2", "92", "posturl2", "<p>blabla</p>", SOME_TIMESTAMP, SOME_TIMESTAMP);
+  public static final Wish WISH_3 = new Wish(3, "title3", "desc3", "url3", "93", "posturl3", "<p>blabla</p>", SOME_TIMESTAMP, SOME_TIMESTAMP);
+  public static final Wish WISH_4 = new Wish(4, "title4", "desc4", "url4", "94", "posturl4", "<p>blabla</p>", SOME_TIMESTAMP, SOME_TIMESTAMP);
 
   /**
    * List of random wishes to be used in tests

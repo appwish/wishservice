@@ -71,12 +71,13 @@ class PostgresWishRepositoryTest {
       TestData.SOME_COVER_IMAGE_URL);
 
     // when
-    repository.addOne(wishInput)
+    repository.addOne(wishInput, TestData.SOME_AUTHOR_ID)
       .setHandler(event -> {
 
         // then
         context.verify(() -> {
           assertTrue(event.succeeded());
+          assertEquals(TestData.SOME_AUTHOR_ID, event.result().getAuthorId());
           assertEquals(TestData.SOME_TITLE, event.result().getTitle());
           assertEquals(TestData.SOME_MARKDOWN, event.result().getMarkdown());
           assertEquals(TestData.SOME_COVER_IMAGE_URL, event.result().getCoverImageUrl());
@@ -92,7 +93,7 @@ class PostgresWishRepositoryTest {
       TestData.SOME_TITLE,
       TestData.SOME_MARKDOWN,
       TestData.SOME_COVER_IMAGE_URL);
-    context.assertComplete(repository.addOne(wishInput)).setHandler(event -> {
+    context.assertComplete(repository.addOne(wishInput, TestData.SOME_AUTHOR_ID)).setHandler(event -> {
 
       // when
       repository.findOne(new WishQuery(event.result().getId())).setHandler(query -> {
@@ -101,6 +102,7 @@ class PostgresWishRepositoryTest {
         context.verify(() -> {
           assertTrue(query.succeeded());
           assertTrue(query.result().isPresent());
+          assertEquals(TestData.SOME_AUTHOR_ID, query.result().get().getAuthorId());
           assertEquals(TestData.SOME_TITLE, query.result().get().getTitle());
           assertEquals(TestData.SOME_MARKDOWN, query.result().get().getMarkdown());
           assertEquals(TestData.SOME_COVER_IMAGE_URL, query.result().get().getCoverImageUrl());
@@ -113,10 +115,11 @@ class PostgresWishRepositoryTest {
   @Test
   void should_be_able_to_read_multiple_wishes(final Vertx vertx, final VertxTestContext context) {
     // given
-    final Future<Wish> addWish1 = repository.addOne(TestData.WISH_INPUT_1);
-    final Future<Wish> addWish2 = repository.addOne(TestData.WISH_INPUT_2);
-    final Future<Wish> addWish3 = repository.addOne(TestData.WISH_INPUT_3);
-    final Future<Wish> addWish4 = repository.addOne(TestData.WISH_INPUT_4);
+    // TODO authorIds
+    final Future<Wish> addWish1 = repository.addOne(TestData.WISH_INPUT_1, TestData.SOME_AUTHOR_ID);
+    final Future<Wish> addWish2 = repository.addOne(TestData.WISH_INPUT_2, "");
+    final Future<Wish> addWish3 = repository.addOne(TestData.WISH_INPUT_3, "");
+    final Future<Wish> addWish4 = repository.addOne(TestData.WISH_INPUT_4, "");
     context.assertComplete(CompositeFuture.all(addWish1, addWish2, addWish3, addWish4))
       .setHandler(event -> {
 
@@ -150,7 +153,7 @@ class PostgresWishRepositoryTest {
   @Test
   void should_be_able_to_delete_existing_wish(final Vertx vertx, final VertxTestContext context) {
     // given
-    context.assertComplete(repository.addOne(TestData.WISH_INPUT_1)).setHandler(event -> {
+    context.assertComplete(repository.addOne(TestData.WISH_INPUT_1, TestData.SOME_AUTHOR_ID)).setHandler(event -> {
       final long id = event.result().getId();
 
       // when
@@ -190,7 +193,7 @@ class PostgresWishRepositoryTest {
   void  should_update_existing_wish(final Vertx vertx, final VertxTestContext context)
     throws Exception {
     // given
-    context.assertComplete(repository.addOne(TestData.WISH_INPUT_1)).setHandler(event -> {
+    context.assertComplete(repository.addOne(TestData.WISH_INPUT_1, TestData.SOME_AUTHOR_ID)).setHandler(event -> {
       final long id = event.result().getId();
       final UpdateWishInput updated = new UpdateWishInput(id, TestData.WISH_2.getTitle(),
         TestData.WISH_1.getMarkdown(), TestData.WISH_1.getCoverImageUrl());
@@ -214,8 +217,7 @@ class PostgresWishRepositoryTest {
 
   @Test
   @Timeout(value = 5, timeUnit = TimeUnit.SECONDS)
-  void should_fail_fast_on_postgres_connection_error(final Vertx vertx,
-    final VertxTestContext context) throws Exception {
+  void should_fail_fast_on_postgres_connection_error(final Vertx vertx, final VertxTestContext context) throws Exception {
     // given
     final UpdateWishInput updateWishInput = new UpdateWishInput(
       TestData.SOME_ID,
@@ -227,7 +229,7 @@ class PostgresWishRepositoryTest {
     postgres.close();
 
     // when
-    final Future<Wish> addWish = repository.addOne(TestData.WISH_INPUT_1);
+    final Future<Wish> addWish = repository.addOne(TestData.WISH_INPUT_1, TestData.SOME_AUTHOR_ID);
     final Future<List<Wish>> findAllWishes = repository.findAll(new AllWishQuery());
     final Future<Optional<Wish>> findOneWish = repository.findOne(new WishQuery(TestData.SOME_ID));
     final Future<Optional<Wish>> updateWish = repository.updateOne(updateWishInput);
@@ -244,8 +246,14 @@ class PostgresWishRepositoryTest {
 
   private static boolean isInList(final Wish wish, final List<Wish> list) {
     return list.stream().anyMatch(wishFromList ->
-      wish.getMarkdown().equals(wishFromList.getMarkdown()) &&
+        wish.getAuthorId().equals(wishFromList.getAuthorId()) &&
+        wish.getMarkdown().equals(wishFromList.getMarkdown()) &&
         wish.getTitle().equals(wishFromList.getTitle()) &&
+        wish.getUpdatedAt().equals(wishFromList.getUpdatedAt()) &&
+        wish.getCreatedAt().equals(wishFromList.getCreatedAt()) &&
+        wish.getHtml().equals(wishFromList.getHtml()) &&
+        wish.getId() == wishFromList.getId() &&
+        wish.getSlug() == wishFromList.getSlug() &&
         wish.getCoverImageUrl().equals(wishFromList.getCoverImageUrl()));
   }
 }

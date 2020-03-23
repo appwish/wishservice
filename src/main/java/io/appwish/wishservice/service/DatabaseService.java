@@ -22,6 +22,8 @@ import java.util.Optional;
  */
 public class DatabaseService {
 
+  private static final String USER_ID = "userId";
+
   private final EventBus eventBus;
   private final WishRepository wishRepository;
 
@@ -38,10 +40,16 @@ public class DatabaseService {
       .handler(event -> wishRepository.findOne(event.body()).setHandler(findOneHandler(event)));
 
     eventBus.<WishInput>consumer(Address.CREATE_ONE_WISH.get())
-      .handler(event -> wishRepository.addOne(event.body()).setHandler(addOneHandler(event)));
+      .handler(event -> {
+        final String userId = event.headers().get(USER_ID);
+        wishRepository.addOne(event.body(), userId).setHandler(addOneHandler(event));
+      });
 
     eventBus.<UpdateWishInput>consumer(Address.UPDATE_ONE_WISH.get())
-      .handler(event -> wishRepository.updateOne(event.body()).setHandler(updateOneHandler(event)));
+      .handler(event -> {
+        final String userId = event.headers().get(USER_ID);
+        wishRepository.updateOne(event.body()).setHandler(updateOneHandler(event));
+      });
 
     eventBus.<WishQuery>consumer(Address.DELETE_ONE_WISH.get())
       .handler(event -> wishRepository.deleteOne(event.body()).setHandler(deleteOneHandler(event)));

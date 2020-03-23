@@ -83,14 +83,14 @@ public class PostgresWishRepository implements WishRepository {
   }
 
   @Override
-  public Future<Wish> addOne(final WishInput wish) {
+  public Future<Wish> addOne(final WishInput wish, final String authorId) {
     final Promise<Wish> promise = Promise.promise();
 
     // TODO should parse markdown to HTML
     final Random random = new Random(); // TODO remove hardcoded values
     final LocalDateTime now = LocalDateTime.now();
     client.preparedQuery(Query.INSERT_WISH_QUERY.sql(),
-      Tuple.of(wish.getTitle(), wish.getMarkdown(), wish.getCoverImageUrl(), random.nextLong(), "https://appwish.org/posts/" + random.nextLong(), "HTML", now, now),
+      Tuple.of(wish.getTitle(), wish.getMarkdown(), wish.getCoverImageUrl(), authorId, "https://appwish.org/posts/" + random.nextLong(), "HTML", now, now),
       event -> {
         if (event.succeeded()) {
           if (event.result().iterator().hasNext()) {
@@ -147,6 +147,9 @@ public class PostgresWishRepository implements WishRepository {
     return promise.future();
   }
 
+  // TODO add test should not update not owned wish
+  // TODO add test should not delete not owned wish
+
   private Wish wishFromRow(final Row row) {
     final LocalDateTime createdAt = row.getLocalDateTime(CREATED_AT_COLUMN);
     final LocalDateTime updatedAt = row.getLocalDateTime(UPDATED_AT_COLUMN);
@@ -155,7 +158,7 @@ public class PostgresWishRepository implements WishRepository {
       row.getString(TITLE_COLUMN),
       row.getString(MARKDOWN_COLUMN),
       row.getString(COVER_IMAGE_URL_COLUMN),
-      row.getLong(AUTHOR_ID_COLUMN),
+      row.getString(AUTHOR_ID_COLUMN),
       row.getString(SLUG_COLUMN),
       row.getString(HTML_COLUMN),
 		Timestamp.newBuilder().setNanos(createdAt.toInstant(ZoneOffset.UTC).getNano()).setSeconds(createdAt.toInstant(ZoneOffset.UTC).getEpochSecond()).build(),

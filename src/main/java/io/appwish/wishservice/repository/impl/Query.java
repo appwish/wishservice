@@ -36,10 +36,11 @@ public enum Query {
       + "markdown VARCHAR (255) NOT NULL, "
       + "html VARCHAR (255), "
       + "cover_image_url VARCHAR (255), "
-      + "author_id serial, "
+      + "author_id VARCHAR (50), "
       + "created_at timestamp, "
       + "updated_at timestamp, "
       + "slug VARCHAR (255));");
+// TODO author_id type can't be VARCHAR (50)
 
   private final String sql;
 
