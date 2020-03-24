@@ -34,10 +34,16 @@ public class DatabaseService {
 
   public void registerEventBusEventHandlers() {
     eventBus.<AllWishQuery>consumer(Address.FIND_ALL_WISHES.get())
-      .handler(event -> wishRepository.findAll(event.body()).setHandler(findAllHandler(event)));
+      .handler(event -> {
+        final String userId = event.headers().get(USER_ID);
+        wishRepository.findAll(event.body()).setHandler(findAllHandler(event));
+      });
 
     eventBus.<WishQuery>consumer(Address.FIND_ONE_WISH.get())
-      .handler(event -> wishRepository.findOne(event.body()).setHandler(findOneHandler(event)));
+      .handler(event -> {
+        final String userId = event.headers().get(USER_ID);
+        wishRepository.findOne(event.body()).setHandler(findOneHandler(event));
+      });
 
     eventBus.<WishInput>consumer(Address.CREATE_ONE_WISH.get())
       .handler(event -> {
@@ -48,11 +54,31 @@ public class DatabaseService {
     eventBus.<UpdateWishInput>consumer(Address.UPDATE_ONE_WISH.get())
       .handler(event -> {
         final String userId = event.headers().get(USER_ID);
+
+        wishRepository.isOwner(new WishQuery(event.body().getId()), userId)
+          .onSuccess(isOwner -> {
+          if (isOwner) {
+            wishRepository.updateOne(event.body()).setHandler(updateOneHandler(event));
+          } else {
+            event.fail(1, "User " + userId + " is not an owner of wish " + event.body().getId());
+          }
+        }).onFailure(failure -> event.fail(1, failure.getMessage()));
+
         wishRepository.updateOne(event.body()).setHandler(updateOneHandler(event));
       });
 
     eventBus.<WishQuery>consumer(Address.DELETE_ONE_WISH.get())
-      .handler(event -> wishRepository.deleteOne(event.body()).setHandler(deleteOneHandler(event)));
+      .handler(event -> {
+        final String userId = event.headers().get(USER_ID);
+
+        wishRepository.isOwner(event.body(), userId).onSuccess(isOwner -> {
+          if (isOwner) {
+            wishRepository.deleteOne(event.body()).setHandler(deleteOneHandler(event));
+          } else {
+            event.fail(1, "User " + userId + " is not an owner of wish " + event.body().getId());
+          }
+        }).onFailure(failure -> event.fail(1, failure.getMessage()));
+      });
   }
 
   private Handler<AsyncResult<Boolean>> deleteOneHandler(final Message<WishQuery> event) {

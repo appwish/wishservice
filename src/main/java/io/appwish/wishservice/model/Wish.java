@@ -34,6 +34,7 @@ public class Wish {
   @ProtoField
   private String coverImageUrl;
 
+  // TODO decide on ID type
   @ProtoField
   private String authorId;
 

@@ -23,4 +23,6 @@ public interface WishRepository {
   Future<Boolean> deleteOne(final WishQuery query);
 
   Future<Optional<Wish>> updateOne(final UpdateWishInput input);
+
+  Future<Boolean> isOwner(final WishQuery query, final String authorId);
 }

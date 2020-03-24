@@ -219,6 +219,7 @@ class PostgresWishRepositoryTest {
   @Timeout(value = 5, timeUnit = TimeUnit.SECONDS)
   void should_fail_fast_on_postgres_connection_error(final Vertx vertx, final VertxTestContext context) throws Exception {
     // given
+    final WishQuery query = new WishQuery(TestData.SOME_ID);
     final UpdateWishInput updateWishInput = new UpdateWishInput(
       TestData.SOME_ID,
       TestData.SOME_TITLE,
@@ -231,16 +232,61 @@ class PostgresWishRepositoryTest {
     // when
     final Future<Wish> addWish = repository.addOne(TestData.WISH_INPUT_1, TestData.SOME_AUTHOR_ID);
     final Future<List<Wish>> findAllWishes = repository.findAll(new AllWishQuery());
-    final Future<Optional<Wish>> findOneWish = repository.findOne(new WishQuery(TestData.SOME_ID));
+    final Future<Optional<Wish>> findOneWish = repository.findOne(query);
     final Future<Optional<Wish>> updateWish = repository.updateOne(updateWishInput);
+    final Future<Boolean> isOwner = repository.isOwner(query, TestData.SOME_AUTHOR_ID);
 
     // then
-    CompositeFuture.any(addWish, findAllWishes, findOneWish, updateWish).setHandler(event -> {
+    CompositeFuture.any(addWish, findAllWishes, findOneWish, updateWish, isOwner).setHandler(event -> {
       if (event.succeeded()) {
         context.failNow(new AssertionError("All queries should fail!"));
       } else {
         context.completeNow();
       }
+    });
+  }
+
+  @Test
+  void should_be_able_to_determine_owner(final Vertx vertx, final VertxTestContext context) {
+    // given
+    final WishInput wishInput = new WishInput(
+      TestData.SOME_TITLE,
+      TestData.SOME_MARKDOWN,
+      TestData.SOME_COVER_IMAGE_URL);
+    context.assertComplete(repository.addOne(wishInput, TestData.SOME_AUTHOR_ID)).setHandler(event -> {
+
+      // when
+      repository.isOwner(new WishQuery(event.result().getId()), TestData.SOME_AUTHOR_ID).setHandler(query -> {
+
+        // then
+        context.verify(() -> {
+          assertTrue(query.succeeded());
+          assertTrue(query.result());
+          context.completeNow();
+        });
+      });
+    });
+  }
+
+  @Test
+  void should_be_able_to_detect_if_not_owner(final Vertx vertx, final VertxTestContext context) {
+    // given
+    final WishInput wishInput = new WishInput(
+      TestData.SOME_TITLE,
+      TestData.SOME_MARKDOWN,
+      TestData.SOME_COVER_IMAGE_URL);
+    context.assertComplete(repository.addOne(wishInput, TestData.SOME_AUTHOR_ID)).setHandler(event -> {
+
+      // when
+      repository.isOwner(new WishQuery(event.result().getId()), "NOT_AUTHOR").setHandler(query -> {
+
+        // then
+        context.verify(() -> {
+          assertTrue(query.succeeded());
+          assertFalse(query.result());
+          context.completeNow();
+        });
+      });
     });
   }
 

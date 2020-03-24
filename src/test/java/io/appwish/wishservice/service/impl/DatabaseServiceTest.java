@@ -11,6 +11,7 @@ import io.appwish.wishservice.eventbus.EventBusConfigurer;
 import io.appwish.wishservice.model.Wish;
 import io.appwish.wishservice.model.input.UpdateWishInput;
 import io.appwish.wishservice.model.query.AllWishQuery;
+import io.appwish.wishservice.model.query.WishQuery;
 import io.appwish.wishservice.repository.WishRepository;
 import io.appwish.wishservice.service.DatabaseService;
 import io.vertx.core.Future;
@@ -119,9 +120,12 @@ class DatabaseServiceTest {
     // given
     when(wishRepository.deleteOne(TestData.WISH_QUERY))
       .thenReturn(Future.succeededFuture(true));
+    when(wishRepository.isOwner(TestData.WISH_QUERY, TestData.SOME_AUTHOR_ID))
+      .thenReturn(Future.succeededFuture(true));
 
     // when
-    vertx.eventBus().<Boolean>request(Address.DELETE_ONE_WISH.get(), TestData.WISH_QUERY, event -> {
+    vertx.eventBus().<Boolean>request(Address.DELETE_ONE_WISH.get(), TestData.WISH_QUERY,
+      new DeliveryOptions().addHeader("userId", TestData.SOME_AUTHOR_ID), event -> {
 
       // then
       context.verify(() -> {
@@ -137,10 +141,12 @@ class DatabaseServiceTest {
     // given
     when(wishRepository.deleteOne(TestData.WISH_QUERY))
       .thenReturn(Future.succeededFuture(false));
+    when(wishRepository.isOwner(TestData.WISH_QUERY, TestData.SOME_AUTHOR_ID))
+      .thenReturn(Future.succeededFuture(true));
 
     // when
-    vertx.eventBus().<Boolean>request(Address.DELETE_ONE_WISH.get(),
-      TestData.WISH_QUERY, event -> {
+    vertx.eventBus().<Boolean>request(Address.DELETE_ONE_WISH.get(), TestData.WISH_QUERY,
+      new DeliveryOptions().addHeader("userId", TestData.SOME_AUTHOR_ID), event -> {
 
         // then
         context.verify(() -> {
@@ -157,14 +163,36 @@ class DatabaseServiceTest {
     // given
     when(wishRepository.deleteOne(TestData.WISH_QUERY))
       .thenReturn(Future.failedFuture(new AssertionError()));
+    when(wishRepository.isOwner(TestData.WISH_QUERY, TestData.SOME_AUTHOR_ID))
+      .thenReturn(Future.succeededFuture(true));
 
     // when
-    vertx.eventBus().<Boolean>request(Address.DELETE_ONE_WISH.get(),
-      TestData.WISH_QUERY, event -> {
+    vertx.eventBus().<Boolean>request(Address.DELETE_ONE_WISH.get(), TestData.WISH_QUERY,
+      new DeliveryOptions().addHeader("userId", TestData.SOME_AUTHOR_ID), event -> {
 
         // then
         context.verify(() -> {
           assertTrue(event.failed());
+          context.completeNow();
+        });
+      });
+  }
+
+  @Test
+  void should_not_delete_if_user_not_wish_owner(final Vertx vertx, final VertxTestContext context) {
+    // given
+    when(wishRepository.deleteOne(TestData.WISH_QUERY))
+      .thenReturn(Future.succeededFuture(true));
+    when(wishRepository.isOwner(TestData.WISH_QUERY, TestData.SOME_AUTHOR_ID))
+      .thenReturn(Future.succeededFuture(false));
+
+    // when
+    vertx.eventBus().<Boolean>request(Address.DELETE_ONE_WISH.get(), TestData.WISH_QUERY,
+      new DeliveryOptions().addHeader("userId", TestData.SOME_AUTHOR_ID), event -> {
+
+        // then
+        context.verify(() -> {
+          assertEquals("User " + TestData.SOME_AUTHOR_ID + " is not an owner of wish " + TestData.WISH_QUERY.getId(), event.cause().getMessage());
           context.completeNow();
         });
       });
@@ -233,9 +261,12 @@ class DatabaseServiceTest {
     final UpdateWishInput input = TestData.UPDATE_WISH_INPUT;
     when(wishRepository.updateOne(input))
       .thenReturn(Future.succeededFuture(Optional.of(TestData.WISH_4)));
+    when(wishRepository.isOwner(new WishQuery(input.getId()), TestData.SOME_AUTHOR_ID))
+      .thenReturn(Future.succeededFuture(true));
 
     // when
-    vertx.eventBus().<Optional<Wish>>request(Address.UPDATE_ONE_WISH.get(), input, event -> {
+    vertx.eventBus().<Optional<Wish>>request(Address.UPDATE_ONE_WISH.get(), input,
+      new DeliveryOptions().addHeader("userId", TestData.SOME_AUTHOR_ID), event -> {
 
       // then
       context.verify(() -> {
@@ -246,12 +277,36 @@ class DatabaseServiceTest {
   }
 
   @Test
+  void should_not_update_when_user_is_not_wish_owner(final Vertx vertx, final VertxTestContext context) {
+    // given
+    final UpdateWishInput input = TestData.UPDATE_WISH_INPUT;
+    when(wishRepository.updateOne(input))
+      .thenReturn(Future.succeededFuture(Optional.of(TestData.WISH_4)));
+    when(wishRepository.isOwner(new WishQuery(input.getId()), TestData.SOME_AUTHOR_ID))
+      .thenReturn(Future.succeededFuture(false));
+
+    // when
+    vertx.eventBus().<Optional<Wish>>request(Address.UPDATE_ONE_WISH.get(), input,
+      new DeliveryOptions().addHeader("userId", TestData.SOME_AUTHOR_ID), event -> {
+
+      // then
+      context.verify(() -> {
+        assertTrue(event.failed());
+        context.completeNow();
+      });
+    });
+  }
+
+  @Test
   void should_return_empty_if_not_updated(final Vertx vertx, final VertxTestContext context) {
     // given
     when(wishRepository.updateOne(TestData.UPDATE_WISH_INPUT)).thenReturn(Future.succeededFuture(Optional.empty()));
+    when(wishRepository.isOwner(new WishQuery(TestData.UPDATE_WISH_INPUT.getId()), TestData.SOME_AUTHOR_ID))
+      .thenReturn(Future.succeededFuture(true));
 
     // when
-    vertx.eventBus().<Optional<Wish>>request(Address.UPDATE_ONE_WISH.get(), TestData.UPDATE_WISH_INPUT, event -> {
+    vertx.eventBus().<Optional<Wish>>request(Address.UPDATE_ONE_WISH.get(), TestData.UPDATE_WISH_INPUT,
+      new DeliveryOptions().addHeader("userId", TestData.SOME_AUTHOR_ID), event -> {
 
       // then
       context.verify(() -> {
@@ -267,9 +322,12 @@ class DatabaseServiceTest {
     final VertxTestContext context) {
     // given
     when(wishRepository.updateOne(TestData.UPDATE_WISH_INPUT)).thenReturn(Future.failedFuture(new AssertionError()));
+    when(wishRepository.isOwner(new WishQuery(TestData.UPDATE_WISH_INPUT.getId()), TestData.SOME_AUTHOR_ID))
+      .thenReturn(Future.succeededFuture(true));
 
     // when
-    vertx.eventBus().<Optional<Wish>>request(Address.UPDATE_ONE_WISH.get(), TestData.UPDATE_WISH_INPUT, event -> {
+    vertx.eventBus().<Optional<Wish>>request(Address.UPDATE_ONE_WISH.get(), TestData.UPDATE_WISH_INPUT,
+      new DeliveryOptions().addHeader("userId", TestData.SOME_AUTHOR_ID), event -> {
 
       // then
       context.verify(() -> {

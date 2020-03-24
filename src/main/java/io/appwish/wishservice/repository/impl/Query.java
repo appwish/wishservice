@@ -39,7 +39,8 @@ public enum Query {
       + "author_id VARCHAR (50), "
       + "created_at timestamp, "
       + "updated_at timestamp, "
-      + "slug VARCHAR (255));");
+      + "slug VARCHAR (255));"),
+  IS_OWNER_QUERY("SELECT id FROM WISHES WHERE id=$1 AND author_id=$2");
 // TODO author_id type can't be VARCHAR (50)
 
   private final String sql;

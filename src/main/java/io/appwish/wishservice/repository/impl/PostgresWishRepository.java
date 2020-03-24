@@ -147,6 +147,28 @@ public class PostgresWishRepository implements WishRepository {
     return promise.future();
   }
 
+  @Override
+  public Future<Boolean> isOwner(final WishQuery query, final String authorId) {
+    final Promise<Boolean> promise = Promise.promise();
+
+    client.preparedQuery(Query.IS_OWNER_QUERY.sql(),
+      Tuple.of(query.getId(), authorId),
+      event -> {
+        if (event.succeeded()) {
+          if (event.result().iterator().hasNext()) {
+            final Row row = event.result().iterator().next();
+            promise.complete(row.getLong(ID_COLUMN) == query.getId());
+          } else {
+            promise.complete(false);
+          }
+        } else {
+          promise.fail(event.cause());
+        }
+      });
+
+    return promise.future();
+  }
+
   // TODO add test should not update not owned wish
   // TODO add test should not delete not owned wish
 
