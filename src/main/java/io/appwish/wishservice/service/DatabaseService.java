@@ -13,8 +13,11 @@ import io.vertx.core.Handler;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.Message;
+
 import java.util.List;
 import java.util.Optional;
+
+import static java.util.Objects.isNull;
 
 /**
  * Exposes the wish repository on the event bus. Takes data from the wish repository and replies to
@@ -48,6 +51,12 @@ public class DatabaseService {
     eventBus.<WishInput>consumer(Address.CREATE_ONE_WISH.get())
       .handler(event -> {
         final String userId = event.headers().get(USER_ID);
+
+        if (isNull(userId)) {
+          event.fail(1, "User needs to be authenticated to create a wish.");
+          return;
+        }
+
         wishRepository.addOne(event.body(), userId).setHandler(addOneHandler(event));
       });
 

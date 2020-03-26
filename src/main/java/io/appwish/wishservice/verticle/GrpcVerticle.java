@@ -1,15 +1,10 @@
 package io.appwish.wishservice.verticle;
 
+import io.appwish.wishservice.interceptor.ExceptionDetailsInterceptor;
 import io.appwish.wishservice.service.GrpcServiceImpl;
-import io.grpc.BindableService;
-import io.grpc.Context;
-import io.grpc.Contexts;
-import io.grpc.Metadata;
+import io.grpc.*;
 import io.grpc.Metadata.Key;
-import io.grpc.ServerCall;
 import io.grpc.ServerCall.Listener;
-import io.grpc.ServerCallHandler;
-import io.grpc.ServerInterceptor;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
@@ -45,6 +40,7 @@ public class GrpcVerticle extends AbstractVerticle {
     final VertxServer server = VertxServerBuilder
       .forAddress(vertx, appHost, appPort)
       .intercept(userContextInterceptor())
+      .intercept(new ExceptionDetailsInterceptor())
       .addService(grpcWishService)
       .build();
 
