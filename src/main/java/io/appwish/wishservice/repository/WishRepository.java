@@ -18,9 +18,11 @@ public interface WishRepository {
 
   Future<Optional<Wish>> findOne(final WishQuery query);
 
-  Future<Wish> addOne(final WishInput input);
+  Future<Wish> addOne(final WishInput input, final String authorId);
 
   Future<Boolean> deleteOne(final WishQuery query);
 
   Future<Optional<Wish>> updateOne(final UpdateWishInput input);
+
+  Future<Boolean> isOwner(final WishQuery query, final String authorId);
 }

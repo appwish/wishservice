@@ -13,14 +13,19 @@ import io.vertx.core.Handler;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.Message;
+
 import java.util.List;
 import java.util.Optional;
+
+import static java.util.Objects.isNull;
 
 /**
  * Exposes the wish repository on the event bus. Takes data from the wish repository and replies to
  * requests on the event bus.
  */
 public class DatabaseService {
+
+  private static final String USER_ID = "userId";
 
   private final EventBus eventBus;
   private final WishRepository wishRepository;
@@ -32,19 +37,57 @@ public class DatabaseService {
 
   public void registerEventBusEventHandlers() {
     eventBus.<AllWishQuery>consumer(Address.FIND_ALL_WISHES.get())
-      .handler(event -> wishRepository.findAll(event.body()).setHandler(findAllHandler(event)));
+      .handler(event -> {
+        final String userId = event.headers().get(USER_ID);
+        wishRepository.findAll(event.body()).setHandler(findAllHandler(event));
+      });
 
     eventBus.<WishQuery>consumer(Address.FIND_ONE_WISH.get())
-      .handler(event -> wishRepository.findOne(event.body()).setHandler(findOneHandler(event)));
+      .handler(event -> {
+        final String userId = event.headers().get(USER_ID);
+        wishRepository.findOne(event.body()).setHandler(findOneHandler(event));
+      });
 
     eventBus.<WishInput>consumer(Address.CREATE_ONE_WISH.get())
-      .handler(event -> wishRepository.addOne(event.body()).setHandler(addOneHandler(event)));
+      .handler(event -> {
+        final String userId = event.headers().get(USER_ID);
+
+        if (isNull(userId)) {
+          event.fail(1, "User needs to be authenticated to create a wish.");
+          return;
+        }
+
+        wishRepository.addOne(event.body(), userId).setHandler(addOneHandler(event));
+      });
 
     eventBus.<UpdateWishInput>consumer(Address.UPDATE_ONE_WISH.get())
-      .handler(event -> wishRepository.updateOne(event.body()).setHandler(updateOneHandler(event)));
+      .handler(event -> {
+        final String userId = event.headers().get(USER_ID);
+
+        wishRepository.isOwner(new WishQuery(event.body().getId()), userId)
+          .onSuccess(isOwner -> {
+          if (isOwner) {
+            wishRepository.updateOne(event.body()).setHandler(updateOneHandler(event));
+          } else {
+            event.fail(1, "User " + userId + " is not an owner of wish " + event.body().getId());
+          }
+        }).onFailure(failure -> event.fail(1, failure.getMessage()));
+
+        wishRepository.updateOne(event.body()).setHandler(updateOneHandler(event));
+      });
 
     eventBus.<WishQuery>consumer(Address.DELETE_ONE_WISH.get())
-      .handler(event -> wishRepository.deleteOne(event.body()).setHandler(deleteOneHandler(event)));
+      .handler(event -> {
+        final String userId = event.headers().get(USER_ID);
+
+        wishRepository.isOwner(event.body(), userId).onSuccess(isOwner -> {
+          if (isOwner) {
+            wishRepository.deleteOne(event.body()).setHandler(deleteOneHandler(event));
+          } else {
+            event.fail(1, "User " + userId + " is not an owner of wish " + event.body().getId());
+          }
+        }).onFailure(failure -> event.fail(1, failure.getMessage()));
+      });
   }
 
   private Handler<AsyncResult<Boolean>> deleteOneHandler(final Message<WishQuery> event) {

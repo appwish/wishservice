@@ -1,6 +1,6 @@
 {
   "env": "dev",
-  "appPort": 8080,
+  "appPort": 8081,
   "appHost": "localhost",
   "dbPort": 5432,
   "dbHost": "localhost",

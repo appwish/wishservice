@@ -34,8 +34,9 @@ public class Wish {
   @ProtoField
   private String coverImageUrl;
 
+  // TODO decide on ID type
   @ProtoField
-  private long authorId;
+  private String authorId;
 
   @ProtoField
   private String slug;
@@ -46,7 +47,7 @@ public class Wish {
   @ProtoField
   private Timestamp updatedAt;
 
-  public Wish(final long id, final String title, final String markdown, final String coverImageUrl, final long authorId, final String slug, final String html, final Timestamp createdAt, final Timestamp updatedAt) {
+  public Wish(final long id, final String title, final String markdown, final String coverImageUrl, final String authorId, final String slug, final String html, final Timestamp createdAt, final Timestamp updatedAt) {
     this.id = id;
     this.title = title;
     this.markdown = markdown;
@@ -93,11 +94,11 @@ public class Wish {
     return coverImageUrl;
   }
 
-  public long getAuthorId() {
+  public String  getAuthorId() {
     return authorId;
   }
 
-  public void setAuthorId(long authorId) {
+  public void setAuthorId(String authorId) {
     this.authorId = authorId;
   }
 
